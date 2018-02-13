@@ -1,12 +1,12 @@
 import cocos
 from cocos.actions import *
 from move import check_field_on_shah, exist_moves, field_legal
-from show_move import det_cell_king, move, start_parameter_2
+from show_move import det_cell_king, det_castling_control, move, start_parameter_2
 from math_utilite import *
 from field import trans_field, print_field
 import notation
 import copy
-from engine import evaluation
+from engine import testing
 
 colors = {'w' : 'White-',
           'b' : 'Black-'}
@@ -47,7 +47,7 @@ def start_parameter(self):
     self.textview_notation = ''
     start_parameter_2()
     from show_move import cell_king, castling_control, take_on_aisle
-    self.positions = {'0b' : (trans_field(), (cell_king, castling_control, take_on_aisle))}
+    self.positions = {'0b' : (trans_field(), (cell_king, castling_control, False, take_on_aisle))}
     
 
 def start_graph(self):
@@ -85,9 +85,9 @@ def fieldsubs(self, num):
     self.sprites = {}
     posit = self.positions[num]
     self.field = posit[0]
-    self.player = 'b' if num[1] == 'w' else 'w'
+    self.player = un(num[-1])
     start_parameter_2(par=posit[1])
-    self.numstep = int(num[0]) if num[1] == 'w' else int(num[0])+1
+    self.numstep = int(num[:-1]) if num[-1] == 'w' else int(num[:-1])+1
     figureadd(self)
     
     
@@ -113,7 +113,8 @@ def graph_move(self, det):
     move(self.field, self.activ, target, trans_fig='q', main=1)
     self.positions = positions
     addpositions(self)
-    self.sprites.pop('shell').kill()
+    if 'shell' in self.sprites:
+        self.sprites.pop('shell').kill()
     sprite = self.sprites[self.activ]
     sprite.do(Place(graph_coord(target, self.flip)))
     if target in self.sprites.keys():
@@ -121,10 +122,16 @@ def graph_move(self, det):
     self.sprites[(target[0], target[1])] = sprite
     self.sprites.pop(self.activ)
     step_deviation(self, det[2:], sprite)
-    self.player = 'w' if self.player=='b' else 'b'
+    self.player = un(self.player)
     notation.upnotation(self, det, fig, beat, distin)
     if self.player == 'w':
         self.numstep += 1
+    else:
+        num = self.positions[str(self.numstep)+'w']
+        bmove = testing((num[0],'b',num[1]))
+        self.activ = bmove[0]
+        self.target = bmove[1]
+        graph_move(self, bmove[2])
     self.activ = (8, 8)
     
 def button_click(self, act, name, pos):
@@ -140,10 +147,11 @@ def button_click(self, act, name, pos):
         self.pos = pos
 
 def det_mate(self):
-    if not exist_moves(self.field, self.player):
-        unplayer = 'w' if self.player=='b' else 'b'
-        figures = {(x, y): self.field[x][y] for x in range(8) for y in range(8) if self.field[x][y][0]==unplayer}
-        if check_field_on_shah(self.field, self.player, figures):
+    field = self.field
+    player = self.player
+    if not exist_moves(field, player):
+        figures = {(x, y): field[x][y] for x in range(8) for y in range(8) if field[x][y][0]==un(player)}
+        if check_field_on_shah(field, player, figures):
             label = cocos.text.Label('Мат', font_size=48, position=(400, 400), color=(255,0,0,255))
             self.add(label)
             self.labels['mate'] = label
@@ -170,7 +178,8 @@ def step_deviation(self, det, sprite):
         self.sprites.pop((target[0]-sign(ord(self.player) - ord('l')), target[1])).kill()
 
 def closered(self):
-    det_cell_king(self.field)
+    ck = det_cell_king(self.field)
+    cc = det_castling_control(self.field)
     if field_legal(self.field, self.player):
         self.red.kill()
         self.red = ()
@@ -181,14 +190,13 @@ def closered(self):
             self.textview_notation.kill()
             self.textview_notation = ''
         self.notation = []
-        from show_move import cell_king, castling_control, take_on_aisle
-        self.positions = {'0b' : (self.field, (cell_king, castling_control, take_on_aisle))}
+        self.positions = {'0b' : (self.field, (ck, cc, False, ('l',8)))}
         self.numstep = 1
         self.chosen = 'none'
 
 def addpositions(self):
     from show_move import cell_king, castling_control, take_on_aisle
-    self.positions[str(self.numstep)+self.player] = (self.field, (cell_king, castling_control, take_on_aisle))
+    self.positions[str(self.numstep)+self.player] = (self.field, (cell_king, castling_control, False, take_on_aisle))
 
 
         
@@ -201,7 +209,7 @@ def click_board(self, x, y):
     self.target = det_target(x, y, self.flip)
     target = self.target
     if self.field[target[0]][target[1]][0]==self.player:
-        self.chose_fig()
+        self.chose_fig(x, y)
         
         
     

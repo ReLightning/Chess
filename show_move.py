@@ -1,26 +1,36 @@
 from field import print_field
-from math_utilite import sign
+from math_utilite import sign, un
 import copy
 
-defpar = ({'w' : (0, 4),
-           'b' : (7, 4)},
-          {'w' : (0, 0, 0),
-          'b' : (0, 0, 0)},
-          ('l', 8))
+
 def start_parameter_2(par = ({'w' : (0, 4),
                               'b' : (7, 4)},
                              {'w' : (0, 0, 0),
                               'b' : (0, 0, 0)},
+                             False,
                              ('l', 8))):
     global cell_king, castling_control, trans, take_on_aisle
     cell_king = par[0]
     castling_control = par[1]
-    trans = False
-    take_on_aisle = par[2]
+    trans = par[2]
+    take_on_aisle = par[3]
     
 def det_cell_king(field):
     global cell_king
     cell_king = {field[x][y][0]:(x, y) for x in range(8) for y in range(8) if field[x][y][1]=='k'}
+    return cell_king
+
+def det_castling_control(field):
+    global castling_control
+    for color in ('w', 'b'):
+        col = sign(ord(color)-ord('l'))
+        col = int(3.5-3.5*col)
+        dk = 0 if field[col][4] == (color, 'k') else 1
+        dlr = 0 if field[col][0] == (color, 'r') else 1
+        drr = 0 if field[col][-1] == (color, 'r') else 1
+        castling_control[color] = (dk, dlr, drr)
+    return castling_control
+    
     
 def king_and_castling(field, color, old, new, d):
     global cell_king, castling_control
@@ -34,16 +44,16 @@ def king_and_castling(field, color, old, new, d):
             field[new[0]][new[1]-sign(storlg)] = ('_', '_')
             field[new[0]][int(3.5-3.5*sign(storlg))] = (color, 'r')
         cont = castling_control[color]    
-        castling_control.update({color : (cont[0], cont[1]+d*(sign(storlg)*d+1), cont[2]+d*(-sign(storlg)*d+1))})    
-    castling_control.update({color : (castling_control[color][0]+d, castling_control[color][1], castling_control[color][2])})
+        castling_control[color] = (cont[0], cont[1]+d*(sign(storlg)*d+1), cont[2]+d*(-sign(storlg)*d+1))    
+    castling_control[color] = (castling_control[color][0]+d, castling_control[color][1], castling_control[color][2])
 
 def rook(field, color, old, new, d):
     if (old[0] % 7 == 0 and old[1] % 7 == 0 and d == 1) or (new[0] % 7 == 0 and new[1] % 7 == 0 and d == -1):
         cont = castling_control[color]
         if (old[0] % 7 == 0 and old[1] % 7 == 0 and d == 1):
-            castling_control.update({color : (cont[0], cont[1] + (sign(old[1]-3)+1), cont[2] + (-sign(old[1]-3)+1) )})
+            castling_control[color] = (cont[0], cont[1] + (sign(old[1]-3)+1), cont[2] + (-sign(old[1]-3)+1))
         if (new[0] % 7 == 0 and new[1] % 7 == 0 and d == -1):
-            castling_control.update({color : (cont[0], cont[1] - (sign(new[1]-3)+1), cont[2] - (-sign(new[1]-3)+1) )})
+            castling_control[color] = (cont[0], cont[1] - (sign(new[1]-3)+1), cont[2] - (-sign(new[1]-3)+1))
 
 def trans_pawn(color, old):
     col = sign(ord(color) - ord('l'))
@@ -59,14 +69,13 @@ def take_on_aisle_pawn(color, old, new):
 
 def take_on_aisle_move(field, color, old, new, fig, d, main):
     global take_on_aisle
-    uncolor = 'w' if color=='b' else 'b'
     if main == 1:
         take_on_aisle_pawn(color, old, new)
     if abs(old[1]-new[1]) == 1:
         if field[new[0]][new[1]][0] == '_' and d == 1:
             field[old[0]][new[1]] = ('_', '_')
         if fig == ('_', '_') and d == -1:
-            field[new[0]][old[1]] = (uncolor, 'p')
+            field[new[0]][old[1]] = (un(color), 'p')
 
 def move(field, old, new, fig=('_','_'), d=1, trans_fig='p', main=0):
     global trans, take_on_aisle

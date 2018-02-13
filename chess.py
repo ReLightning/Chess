@@ -1,11 +1,14 @@
 from field import trans_field, print_field
-from move import possible_moves, start_parameter_1
+from move import possible_moves, all_possible_moves
 from math_utilite import *
 from show_move import start_parameter_2
 import cocos
 from cocos.actions import *
 import interface
 import notation
+from engine import testing
+from time import sleep
+
 
 
 
@@ -14,7 +17,7 @@ class graph(cocos.layer.Layer):
     def __init__(self):
         super(graph, self).__init__()
         interface.start_parameter(self)
-        interface.start_graph(self)        
+        interface.start_graph(self)
         
     def on_mouse_press(self, x, y, buttons, modifiers):
         if buttons == 1:
@@ -61,7 +64,7 @@ class graph(cocos.layer.Layer):
                     self.redactor(x,y)
             elif self.activ != (8, 8): 
                 self.chose_cage(x, y)
-                
+
     def on_key_press(self, key, modifiers):
         if key == 65361:
             num = str(self.numstep-1)+self.player
@@ -72,14 +75,14 @@ class graph(cocos.layer.Layer):
             if num in self.positions:
                 interface.fieldsubs(self, num)
                 
-    def chose_fig(self):
+    def chose_fig(self, x, y):
         global poss_moves, det_moves
         field = self.field
-        x, y = self.target
         self.activ = self.target
         interface.shelladd(self)
         self.remove(self.sprites[self.activ])
         self.add(self.sprites[self.activ], z=1)
+        self.sprites[self.activ].do(Place((x, y)))
         possibles = possible_moves(field, self.target, self.player)
         poss_moves = [possible[:2] for possible in possibles]
         det_moves = [possible[-1] for possible in possibles]
@@ -89,7 +92,7 @@ class graph(cocos.layer.Layer):
         field = self.field
         self.target = det_target(x, y, self.flip)
         target = self.target
-        if target not in poss_moves:
+        if target not in poss_moves or not (80<=x<=720 and 80<=y<=720):
             self.sprites[self.activ].do(Place(graph_coord(self.activ, self.flip)))
             self.add(self.sprites[self.activ], z=0)
             self.sprites.pop('shell').kill()
@@ -113,13 +116,14 @@ class graph(cocos.layer.Layer):
             self.textview_notation.kill()
             self.textview_notation = ''
         self.notation = []
-        start_parameter_2(par=({'w' : (0, 4),
-                                'b' : (7, 4)},
+        start_parameter_2(par=({'w' : (5, 5),
+                                'b' : (6, 7)},
                                {'w' : (0, 0, 0),
                                 'b' : (0, 0, 0)},
+                               False,
                                ('l', 8)))
         from show_move import cell_king, castling_control, take_on_aisle
-        self.positions = {'0b' : (trans_field(), (cell_king, castling_control, take_on_aisle))}
+        self.positions = {'0b' : (trans_field(), (cell_king, castling_control, False, take_on_aisle))}
 
     def butredactor(self):
         t_player = 'Белые' if self.player == 'w' else 'Чёрные'
@@ -133,7 +137,7 @@ class graph(cocos.layer.Layer):
     def redactor(self, x, y):
         field = self.field
         if 870<x<930 and 635<y<658:
-            self.player = 'w' if self.player == 'b' else 'b'
+            self.player = un(self.player)
             t_player = 'Белые' if self.player == 'w' else 'Чёрные'
             self.labels['player'].kill()
             label = cocos.text.Label('Ходят:'+t_player, position=(820,643), color=(0,0,0,255))
@@ -146,7 +150,7 @@ class graph(cocos.layer.Layer):
             
                                                 
 def demgraph():
-    cocos.director.director.init(fullscreen=True)
+    cocos.director.director.init(width=720, height=720)
     main_scene = cocos.scene.Scene(graph())
     cocos.director.director.run(main_scene)
         

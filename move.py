@@ -1,4 +1,4 @@
-from math_utilite import sign, coords_to_square
+from math_utilite import sign, coords_to_square, un
 from field import print_field
 from show_move import *
 
@@ -43,11 +43,18 @@ move_rules = {'k': king_moves,
               'n': knight_moves,
               'p': pawn_moves}
 
+value = {'_' : 0,
+         'k' : 20,
+         'p' : 1,
+         'n' : 2.5,
+         'b' : 3,
+         'r' : 5,
+         'q' : 10}
+
 def check_field_on_shah(field, player, figures):
     from show_move import cell_king
-    unplayer = 'w' if player=='b' else 'b'
     for x, y in figures:
-        if field[x][y][0] == unplayer and cell_king[player] in possible_moves_without_shah(field, (x, y), unplayer):
+        if field[x][y][0] == un(player) and cell_king[player] in possible_moves_without_shah(field, (x, y), un(player)):
             return True
     return False
 
@@ -62,19 +69,17 @@ def collision(field, start_coord, end_coord):
 
 def possible_pawn_moves_without_shah(field, target, player):
     from show_move import take_on_aisle
-    unplayer = 'w' if player=='b' else 'b'
     color = sign(ord(player)-ord('l'))
     return [(color*x, y) for x, y in pawn_moves()
             if 0<=target[0]+x*color<=7 and 0<=target[1]+y<=7
             and  x in range((16-(target[0]*color)%7)//5)
             and ((y==0 and field[target[0]+x*color][target[1]+y][0]=='_')
-                or (y!=0 and (field[target[0]+x*color][target[1]+y][0]==unplayer
-                              or (take_on_aisle == (unplayer, target[1] + y) and (target[0] * color) % 7 == 4))))]
+                or (y!=0 and (field[target[0]+x*color][target[1]+y][0]==un(player)
+                              or (take_on_aisle == (un(player), target[1] + y) and (target[0] * color) % 7 == 4))))]
     
 def possible_moves_without_shah(field, target, player):
-    unplayer = 'w' if player=='b' else 'b'
     figure = field[target[0]][target[1]][1]
-    figures = {(x, y): field[x][y] for x in range(8) for y in range(8) if field[x][y][0]==unplayer}
+    figures = {(x, y): field[x][y] for x in range(8) for y in range(8) if field[x][y][0]==un(player)}
     if figure=='p':
         all_moves = possible_pawn_moves_without_shah(field, target, player)
     else:
@@ -119,8 +124,7 @@ def possible_castling(field, target, figures, player):
     return poss_castl
 
 def possible_moves(field, target, player):
-    unplayer = 'w' if player=='b' else 'b'
-    figures = {(x, y): field[x][y] for x in range(8) for y in range(8) if field[x][y][0]==unplayer}
+    figures = {(x, y): field[x][y] for x in range(8) for y in range(8) if field[x][y][0]==un(player)}
     poss_ordinary = possible_ordinary_moves(field, target, player, figures)
     poss_castl = possible_castling(field, target, figures, player)
     return poss_ordinary + poss_castl
@@ -137,14 +141,20 @@ def all_possible_moves(field, player):
     apm = []
     for target in figures:
         for tpm in possible_moves(field, target, player):
-            apm.append(field[target[0]][target[1]][1]+tpm[2])
+            delval = value[field[tpm[0]][tpm[1]][1]] - value[field[target[0]][target[1]][1]] if field[tpm[0]][tpm[1]][1] != '_' else -30
+            apm.append((delval, target, tpm[:2], tpm[2][-1]))
+    return sortka(apm)
+
+def sortka(apm):
+    apm.sort()
+    apm = [(d1,d2,d3) for _,d1,d2,d3 in apm]
+    apm.reverse()
     return apm
 
 def field_legal(field, player):
-    unplayer = 'w' if player == 'b' else 'b'
     figures = {(x, y): field[x][y] for x in range(8) for y in range(8) if field[x][y][0]==player}
     kings = [field[x][y][0] for x in range(8) for y in range(8) if field[x][y][1]=='k']
-    return (kings == ['w', 'b'] or kings == ['b', 'w']) and not check_field_on_shah(field, unplayer, figures)
+    return (kings == ['w', 'b'] or kings == ['b', 'w']) and not check_field_on_shah(field, un(player), figures)
 
 
     
