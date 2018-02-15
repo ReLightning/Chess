@@ -1,4 +1,4 @@
-from math_utilite import sign, coords_to_square, un
+from math_utilite import sign, coords_to_square, un, col
 from field import print_field
 from show_move import *
 
@@ -61,7 +61,7 @@ def check_field_on_shah(field, player, figures):
 def collision(field, start_coord, end_coord):
     dx=end_coord[0]-start_coord[0]
     dy=end_coord[1]-start_coord[1]
-    if abs(dx)==abs(dy) or dx==0 or dy==0:
+    if dx==dy or dx==-dy or dx==0 or dy==0:
         for i in range(1,max(abs(dx),abs(dy))):
             if field[start_coord[0]+i*sign(dx)][start_coord[1]+i*sign(dy)]!=('_','_'):
                 return True
@@ -69,7 +69,7 @@ def collision(field, start_coord, end_coord):
 
 def possible_pawn_moves_without_shah(field, target, player):
     from show_move import take_on_aisle
-    color = sign(ord(player)-ord('l'))
+    color = col(player)
     return [(color*x, y) for x, y in pawn_moves()
             if 0<=target[0]+x*color<=7 and 0<=target[1]+y<=7
             and  x in range((16-(target[0]*color)%7)//5)
@@ -79,7 +79,6 @@ def possible_pawn_moves_without_shah(field, target, player):
     
 def possible_moves_without_shah(field, target, player):
     figure = field[target[0]][target[1]][1]
-    figures = {(x, y): field[x][y] for x in range(8) for y in range(8) if field[x][y][0]==un(player)}
     if figure=='p':
         all_moves = possible_pawn_moves_without_shah(field, target, player)
     else:
@@ -123,10 +122,9 @@ def possible_castling(field, target, figures, player):
                 move(field, (x, 4+sign(y-4)), target, d=-1)           
     return poss_castl
 
-def possible_moves(field, target, player):
-    figures = {(x, y): field[x][y] for x in range(8) for y in range(8) if field[x][y][0]==un(player)}
-    poss_ordinary = possible_ordinary_moves(field, target, player, figures)
-    poss_castl = possible_castling(field, target, figures, player)
+def possible_moves(field, target, player, unfigures):
+    poss_ordinary = possible_ordinary_moves(field, target, player, unfigures)
+    poss_castl = possible_castling(field, target, unfigures, player)
     return poss_ordinary + poss_castl
 
 def exist_moves(field, player):
@@ -138,9 +136,10 @@ def exist_moves(field, player):
 
 def all_possible_moves(field, player):
     figures = {(x, y): field[x][y] for x in range(8) for y in range(8) if field[x][y][0]==player}
+    unfigures = {(x, y): field[x][y] for x in range(8) for y in range(8) if field[x][y][0]==un(player)}
     apm = []
     for target in figures:
-        for tpm in possible_moves(field, target, player):
+        for tpm in possible_moves(field, target, player, unfigures):
             delval = value[field[tpm[0]][tpm[1]][1]] - value[field[target[0]][target[1]][1]] if field[tpm[0]][tpm[1]][1] != '_' else -30
             apm.append((delval, target, tpm[:2], tpm[2][-1]))
     return sortka(apm)

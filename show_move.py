@@ -1,5 +1,5 @@
 from field import print_field
-from math_utilite import sign, un
+from math_utilite import sign, un, col
 import copy
 
 
@@ -23,7 +23,7 @@ def det_cell_king(field):
 def det_castling_control(field):
     global castling_control
     for color in ('w', 'b'):
-        col = sign(ord(color)-ord('l'))
+        col = col(color)
         col = int(3.5-3.5*col)
         dk = 0 if field[col][4] == (color, 'k') else 1
         dlr = 0 if field[col][0] == (color, 'r') else 1
@@ -56,8 +56,7 @@ def rook(field, color, old, new, d):
             castling_control[color] = (cont[0], cont[1] - (sign(new[1]-3)+1), cont[2] - (-sign(new[1]-3)+1))
 
 def trans_pawn(color, old):
-    col = sign(ord(color) - ord('l'))
-    return True if (old[0] * col) % 7 == 6 else False
+    return True if (old[0] * col(color)) % 7 == 6 else False
 
 def take_on_aisle_pawn(color, old, new):
     global take_on_aisle

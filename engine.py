@@ -1,7 +1,8 @@
-from math_utilite import sign, un
+from math_utilite import sign, un, col
 from move import all_possible_moves, exist_moves, check_field_on_shah
 from show_move import start_parameter_2, move
 from field import trans_field, print_field
+import cProfile
 
 value = {'k' : 0,
          'p' : 1,
@@ -17,7 +18,7 @@ def evaluation(position):
     evaluate = 0
     for x,y in figures:
         fig = field[x][y]
-        color = sign(ord(fig[0])-ord('l')) if player == 'w' else -sign(ord(fig[0])-ord('l'))
+        color = col(fig[0])*col(player)
         evaluate += color*value[fig[1]]
     return evaluate
 
@@ -61,8 +62,6 @@ def testing(position):
     global maxdepth, bmove, s
     bmove = 0
     s = 0
-    field = position[0]
-    player = position[1]
     start_parameter_2(position[2])
     maxdepth = 4
     score2 = alphabeta(position, 4, -1001, 1001)
@@ -70,16 +69,14 @@ def testing(position):
     return bmove
 
 def testing_testing():
-    print(testing((trans_field(), 'w', ({'w' : (0, 4),
+    testing((trans_field(), 'b', ({'w' : (0, 4),
                                          'b' : (7, 4)},
                                         {'w' : (0, 0, 0),
                                          'b' : (0, 0, 0)},
                                         False,
-                                        ('l', 8)))))
-    print_field(trans_field())
-    print(all_possible_moves(trans_field(), 'w'))
+                                        ('l', 8))))
     
-testing_testing()
+cProfile.run('testing_testing()')
 
 
 

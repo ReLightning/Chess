@@ -1,8 +1,10 @@
 def sign(a):
     if a==0:
         return 0
+    if a>0:
+        return 1
     else:
-        return abs(a)//a
+        return -1
     
 def coords_to_square(target):
     return 'abcdefgh'[target[1]]+str(target[0]+1)
@@ -24,4 +26,7 @@ def det_target(x, y, flip):
 
 def un(player):
     return 'w' if player == 'b' else 'b'
+
+def col(player):
+    return 1 if player == 'w' else -1
 

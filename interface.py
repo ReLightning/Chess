@@ -7,6 +7,7 @@ from field import trans_field, print_field
 import notation
 import copy
 from engine import testing
+import cProfile
 
 colors = {'w' : 'White-',
           'b' : 'Black-'}
