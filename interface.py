@@ -150,8 +150,8 @@ def button_click(self, act, name, pos):
 def det_mate(self):
     field = self.field
     player = self.player
-    if not exist_moves(field, player):
-        figures = {(x, y): field[x][y] for x in range(8) for y in range(8) if field[x][y][0]==un(player)}
+    unfigures = {(x, y): field[x][y] for x in range(8) for y in range(8) if field[x][y][0]==un(player)}
+    if not exist_moves(field, player, unfigures):
         if check_field_on_shah(field, player, figures):
             label = cocos.text.Label('Мат', font_size=48, position=(400, 400), color=(255,0,0,255))
             self.add(label)

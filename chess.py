@@ -83,7 +83,8 @@ class graph(cocos.layer.Layer):
         self.remove(self.sprites[self.activ])
         self.add(self.sprites[self.activ], z=1)
         self.sprites[self.activ].do(Place((x, y)))
-        possibles = possible_moves(field, self.target, self.player)
+        unfigures = {(x, y): field[x][y] for x in range(8) for y in range(8) if field[x][y][0]==un(self.player)}
+        possibles = possible_moves(field, self.target, self.player, unfigures)
         poss_moves = [possible[:2] for possible in possibles]
         det_moves = [possible[-1] for possible in possibles]
             

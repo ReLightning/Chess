@@ -16,16 +16,15 @@ def king_moves():
 def queen_moves():
     return rook_moves() + bishop_moves()
 def rook_moves():
-    return [(0,a) for a in range(-7,8) if a!=0 ] + \
-           [(a,0) for a in range(-7,8) if a!=0 ]
+    return ((1,0), (-1,0), (0,1), (0,1))
 def bishop_moves():
-    return [(a,a) for a in range(-7,8) if a!=0 ] + \
-           [(-a,a) for a in range(-7,8) if a!=0 ]
+    return ((1,1), (-1,1), (1,-1), (-1,-1))
 def knight_moves():
     return [(-2,-1), (-1,-2), (1,-2), (-2,1), (-1,2), (2,-1), (1,2), (2,1)]
 def pawn_moves():
     return [(a,0) for a in range(-2,3) if a!=0] + \
            [(a,rl) for a in (-1,1) for rl in (-1,1) if a!=0 and rl!=0]
+
 def castling(field):
     from show_move import castling_control
     colors = ('w', 'b')
@@ -81,12 +80,22 @@ def possible_moves_without_shah(field, target, player):
     figure = field[target[0]][target[1]][1]
     if figure=='p':
         all_moves = possible_pawn_moves_without_shah(field, target, player)
-    else:
-        all_moves = move_rules[figure]()
-    return [(target[0]+hor, target[1]+vert) for hor,vert in all_moves
-            if 0<=target[0]+hor<=7 and 0<=target[1]+vert<=7
-            and field[target[0]+hor][target[1]+vert][0]!=player
-            and not collision(field, target, (target[0]+hor, target[1]+vert))]
+        return [(target[0]+hor, target[1]+vert) for hor,vert in all_moves
+                if 0<=target[0]+hor<=7 and 0<=target[1]+vert<=7
+                and field[target[0]+hor][target[1]+vert][0]!=player
+                and not collision(field, target, (target[0]+hor, target[1]+vert))]
+    if figure == 'n' or figure == 'k':
+        return [(target[0]+nex[0], target[1]+nex[1]) for nex in move_rules[figure]()
+                 if -1<target[0]+nex[0]<8 and -1<target[1]+nex[1]<8 and field[target[0]+nex[0]][target[1]+nex[1]][0] != player]
+    pm = [] 
+    for nex in (move_rules[figure]()):
+        cel = (target[0]+nex[0], target[1]+nex[1])
+        while -1<cel[0]<8 and -1<cel[1]<8 and field[cel[0]][cel[1]][0] == '_':
+            pm.append(cel)
+            cel = (cel[0]+nex[0], cel[1]+nex[1])
+        if -1<cel[0]<8 and -1<cel[1]<8 and field[cel[0]][cel[1]][0] == un(player):
+            pm.append(cel)
+    return pm
     
 def possible_ordinary_moves(field, target, player, figures):
     poss_ordinary = []
@@ -127,10 +136,10 @@ def possible_moves(field, target, player, unfigures):
     poss_castl = possible_castling(field, target, unfigures, player)
     return poss_ordinary + poss_castl
 
-def exist_moves(field, player):
+def exist_moves(field, player, unfigures):
     figures = {(x, y): field[x][y] for x in range(8) for y in range(8) if field[x][y][0]==player}
     for figure in figures:
-        for pm in possible_moves(field, figure, player):
+        for pm in possible_moves(field, figure, player, unfigures):
             return True
     return False
 

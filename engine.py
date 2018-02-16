@@ -75,8 +75,8 @@ def testing_testing():
                                          'b' : (0, 0, 0)},
                                         False,
                                         ('l', 8))))
-    
-cProfile.run('testing_testing()')
+if True:   
+    cProfile.run('testing_testing()')
 
 
 
