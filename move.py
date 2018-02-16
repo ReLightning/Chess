@@ -12,7 +12,7 @@ def start_parameter_1():
     take_on_aisle = ('l', 8)
     
 def king_moves():
-    return [(1,0), (1,1), (0,1), (-1,1), (-1,0), (-1,-1), (0,-1), (1,-1)]
+    return ((1,0), (1,1), (0,1), (-1,1), (-1,0), (-1,-1), (0,-1), (1,-1))
 def queen_moves():
     return rook_moves() + bishop_moves()
 def rook_moves():
@@ -20,10 +20,9 @@ def rook_moves():
 def bishop_moves():
     return ((1,1), (-1,1), (1,-1), (-1,-1))
 def knight_moves():
-    return [(-2,-1), (-1,-2), (1,-2), (-2,1), (-1,2), (2,-1), (1,2), (2,1)]
+    return ((-2,-1), (-1,-2), (1,-2), (-2,1), (-1,2), (2,-1), (1,2), (2,1))
 def pawn_moves():
-    return [(a,0) for a in range(-2,3) if a!=0] + \
-           [(a,rl) for a in (-1,1) for rl in (-1,1) if a!=0 and rl!=0]
+    return ((1,0), (2,0), (1,1), (1,-1))
 
 def castling(field):
     from show_move import castling_control
@@ -70,11 +69,11 @@ def possible_pawn_moves_without_shah(field, target, player):
     from show_move import take_on_aisle
     color = col(player)
     return [(color*x, y) for x, y in pawn_moves()
-            if 0<=target[0]+x*color<=7 and 0<=target[1]+y<=7
-            and  x in range((16-(target[0]*color)%7)//5)
-            and ((y==0 and field[target[0]+x*color][target[1]+y][0]=='_')
-                or (y!=0 and (field[target[0]+x*color][target[1]+y][0]==un(player)
-                              or (take_on_aisle == (un(player), target[1] + y) and (target[0] * color) % 7 == 4))))]
+                if (y == 0 and field[target[0]+color][target[1]][0] == '_' and (x==1 or
+                                                                               (x==2 and target[0]*color % 7 == 1
+                                                                                     and field[target[0]+2*color][target[1]][0] == '_'))) or
+                   (y != 0 and -1<target[1]+y<8 and (field[target[0]+color][target[1]+y][0] == un(player) or
+                               take_on_aisle == (un(player), target[1] + y) and (target[0] * color) % 7 == 4))]
     
 def possible_moves_without_shah(field, target, player):
     figure = field[target[0]][target[1]][1]
