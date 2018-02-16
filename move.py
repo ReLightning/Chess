@@ -26,13 +26,13 @@ def pawn_moves():
 
 def castling(field):
     from show_move import castling_control
-    colors = ('w', 'b')
-    castls = ('0-0', '0-0-0')
-    return [(color, castl) for color in colors for castl in castls
-            if field[int(3.5-3.5*(-1)**colors.index(color))][4] == (color, 'k')
-            and field[int(3.5-3.5*(-1)**colors.index(color))][int(3.5+3.5*(-1)**castls.index(castl))] == (color, 'r')
-            and castling_control[color][0] == 0 and castling_control[color][castls.index(castl)+1] == 0
-            and not collision(field, (int(3.5-3.5*(-1)**colors.index(color)), 4), (int(3.5-3.5*(-1)**colors.index(color)), int(3.5+3.5*(-1)**castls.index(castl))))]
+    colors = {'w' : 0, 'b' : 7}
+    castl = [(color, side) for color in colors for side in (0, 1)
+             if castling_control[color][0] == 0 and castling_control[color][side+1] == 0 and
+             (side == 0 and field[colors[color]][5][0] == field[colors[color]][6][0] == '_' or
+              side == 1 and field[colors[color]][3][0] == field[colors[color]][2][0] == field[colors[color]][1] == '_')]
+    return [(color, ('0-0','0-0-0')[side]) for color, side in castl]
+             
 
 move_rules = {'k': king_moves,
               'q': queen_moves,
@@ -56,22 +56,14 @@ def check_field_on_shah(field, player, figures):
             return True
     return False
 
-def collision(field, start_coord, end_coord):
-    dx=end_coord[0]-start_coord[0]
-    dy=end_coord[1]-start_coord[1]
-    if dx==dy or dx==-dy or dx==0 or dy==0:
-        for i in range(1,max(abs(dx),abs(dy))):
-            if field[start_coord[0]+i*sign(dx)][start_coord[1]+i*sign(dy)]!=('_','_'):
-                return True
-    return False
 
 def possible_pawn_moves_without_shah(field, target, player):
     from show_move import take_on_aisle
     color = col(player)
-    return [(color*x, y) for x, y in pawn_moves()
+    return [(target[0]+color*x, target[1]+y) for x, y in pawn_moves()
                 if (y == 0 and field[target[0]+color][target[1]][0] == '_' and (x==1 or
                                                                                (x==2 and target[0]*color % 7 == 1
-                                                                                     and field[target[0]+2*color][target[1]][0] == '_'))) or
+                                                                                and field[target[0]+2*color][target[1]][0] == '_'))) or
                    (y != 0 and -1<target[1]+y<8 and (field[target[0]+color][target[1]+y][0] == un(player) or
                                take_on_aisle == (un(player), target[1] + y) and (target[0] * color) % 7 == 4))]
     
@@ -79,10 +71,7 @@ def possible_moves_without_shah(field, target, player):
     figure = field[target[0]][target[1]][1]
     if figure=='p':
         all_moves = possible_pawn_moves_without_shah(field, target, player)
-        return [(target[0]+hor, target[1]+vert) for hor,vert in all_moves
-                if 0<=target[0]+hor<=7 and 0<=target[1]+vert<=7
-                and field[target[0]+hor][target[1]+vert][0]!=player
-                and not collision(field, target, (target[0]+hor, target[1]+vert))]
+        return all_moves
     if figure == 'n' or figure == 'k':
         return [(target[0]+nex[0], target[1]+nex[1]) for nex in move_rules[figure]()
                  if -1<target[0]+nex[0]<8 and -1<target[1]+nex[1]<8 and field[target[0]+nex[0]][target[1]+nex[1]][0] != player]
