@@ -128,11 +128,12 @@ def graph_move(self, det):
     if self.player == 'w':
         self.numstep += 1
     else:
-        num = self.positions[str(self.numstep)+'w']
-        bmove = testing((num[0],'b',num[1]))
-        self.activ = bmove[0]
-        self.target = bmove[1]
-        graph_move(self, bmove[2])
+        if False:
+            num = self.positions[str(self.numstep)+'w']
+            bmove = testing((num[0],'b',num[1]))
+            self.activ = bmove[0]
+            self.target = bmove[1]
+            graph_move(self, bmove[2])
     self.activ = (8, 8)
     
 def button_click(self, act, name, pos):
@@ -152,7 +153,7 @@ def det_mate(self):
     player = self.player
     unfigures = {(x, y): field[x][y] for x in range(8) for y in range(8) if field[x][y][0]==un(player)}
     if not exist_moves(field, player, unfigures):
-        if check_field_on_shah(field, player, figures):
+        if check_field_on_shah(field, player, unfigures):
             label = cocos.text.Label('Мат', font_size=48, position=(400, 400), color=(255,0,0,255))
             self.add(label)
             self.labels['mate'] = label

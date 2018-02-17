@@ -7,7 +7,6 @@ from cocos.actions import *
 import interface
 import notation
 from engine import testing
-from time import sleep
 
 
 

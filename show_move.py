@@ -34,7 +34,7 @@ def det_castling_control(field):
     
 def king_and_castling(field, color, old, new, d):
     global cell_king, castling_control
-    cell_king.update({color : (new[0], new[1])})
+    cell_king[color] = (new[0], new[1])
     storlg=new[1]-old[1]
     if abs(storlg) == 2:
         if d==1:
@@ -44,7 +44,7 @@ def king_and_castling(field, color, old, new, d):
             field[new[0]][new[1]-sign(storlg)] = ('_', '_')
             field[new[0]][int(3.5-3.5*sign(storlg))] = (color, 'r')
         cont = castling_control[color]    
-        castling_control[color] = (cont[0], cont[1]+d*(sign(storlg)*d+1), cont[2]+d*(-sign(storlg)*d+1))    
+        castling_control[color] = (cont[0], cont[1]+d*(-sign(storlg)*d+1), cont[2]+d*(sign(storlg)*d+1))
     castling_control[color] = (castling_control[color][0]+d, castling_control[color][1], castling_control[color][2])
 
 def rook(field, color, old, new, d):

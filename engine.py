@@ -65,8 +65,7 @@ def testing(position):
     start_parameter_2(position[2])
     maxdepth = 5
     score2 = alphabeta(position, 5, -1001, 1001)
-    if True:
-        print(s)
+    print(s)
     return bmove
 
 def testing_testing():

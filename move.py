@@ -30,7 +30,7 @@ def castling(field):
     castl = [(color, side) for color in colors for side in (0, 1)
              if castling_control[color][0] == 0 and castling_control[color][side+1] == 0 and
              (side == 0 and field[colors[color]][5][0] == field[colors[color]][6][0] == '_' or
-              side == 1 and field[colors[color]][3][0] == field[colors[color]][2][0] == field[colors[color]][1] == '_')]
+              side == 1 and field[colors[color]][3][0] == field[colors[color]][2][0] == field[colors[color]][1][0] == '_')]
     return [(color, ('0-0','0-0-0')[side]) for color, side in castl]
              
 
@@ -49,15 +49,52 @@ value = {'_' : 0,
          'r' : 5,
          'q' : 10}
 
-def check_field_on_shah(field, player, figures):
+def check_field_on_shah(field, player, figures, lfig='q'):
     from show_move import cell_king
     for x, y in figures:
-        if field[x][y][0] == un(player) and cell_king[player] in possible_moves_without_shah(field, (x, y), un(player)):
+        if field[x][y][0] == un(player) and det_shah(field, (x, y), cell_king[player], lfig):
             return True
     return False
 
+def det_shah(field, target, ck, lfig):
+    x, y = target
+    figure = field[x][y][1]
+    color = col(field[x][y][0])
+    if lfig != 'k':
+        if figure == 'p':
+            shah = det_p_shah(color, x, y, ck)
+            return shah
+        if figure == 'n' or figure == 'k':
+            shah = det_kn_shah(figure, x, y, ck)
+            return shah
+    if figure in ('b', 'q', 'r'):
+        shah = det_brq_shah(field, figure, x, y, ck)
+        return shah
+    return False
 
-def possible_pawn_moves_without_shah(field, target, player):
+def det_p_shah(color, x, y, ck):
+    return (ck[0]-x, abs(ck[1]-y)) == (color, 1)
+
+def det_kn_shah(figure, x, y, ck):
+    for nex in move_rules[figure]():
+        if ck == (x+nex[0], y+nex[1]):
+            return True
+    return False
+
+def det_brq_shah(field, figure, x, y, ck):
+    nex = (ck[0] - x, ck[1] - y)
+    if nex[0] == 0 or nex[1] == 0 or nex[0]==nex[1] or nex[0]==-nex[1]:
+        nex = (sign(nex[0]), sign(nex[1]))
+        if nex in move_rules[figure]():
+            cel = (x+nex[0], y+nex[1])
+            while ck != cel:
+                if field[cel[0]][cel[1]][0] != '_':
+                    return False
+                cel = (cel[0]+nex[0], cel[1]+nex[1])
+            return True
+    return False
+
+def possible_p_moves(field, target, player):
     from show_move import take_on_aisle
     color = col(player)
     return [(target[0]+color*x, target[1]+y) for x, y in pawn_moves()
@@ -87,7 +124,7 @@ def possible_brq_moves(field, target, player):
 def possible_moves_without_shah(field, target, player):
     figure = field[target[0]][target[1]][1]
     if figure=='p':
-        all_moves = possible_pawn_moves_without_shah(field, target, player)
+        all_moves = possible_p_moves(field, target, player)
         return all_moves
     if figure == 'n' or figure == 'k':
         all_moves = possible_kn_moves(field, target, player)
@@ -101,7 +138,8 @@ def possible_ordinary_moves(field, target, player, figures):
         fig = field[x][y]
         trans = trans_pawn(player, target) and field[target[0]][target[1]][1] == 'p'
         move(field, target, (x, y))
-        if not check_field_on_shah(field, player, figures):
+        lfig = field[x][y][1]
+        if not check_field_on_shah(field, player, figures, lfig):
             if not trans:
                 if field[x][y][1] == 'p' and target[1]-y != 0 and fig[0] == '_':
                     poss_ordinary.append((x, y, coords_to_square((x, y))+'a'))
