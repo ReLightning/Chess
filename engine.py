@@ -63,9 +63,10 @@ def testing(position):
     bmove = 0
     s = 0
     start_parameter_2(position[2])
-    maxdepth = 4
-    score2 = alphabeta(position, 4, -1001, 1001)
-    print(s)
+    maxdepth = 5
+    score2 = alphabeta(position, 5, -1001, 1001)
+    if True:
+        print(s)
     return bmove
 
 def testing_testing():
@@ -75,7 +76,7 @@ def testing_testing():
                                          'b' : (0, 0, 0)},
                                         False,
                                         ('l', 8))))
-if True:   
+if __name__=='__main__':   
     cProfile.run('testing_testing()')
 
 

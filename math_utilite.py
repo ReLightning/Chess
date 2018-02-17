@@ -24,6 +24,7 @@ def graph_coord(target, flip):
 def det_target(x, y, flip):
     return (flip*(y//80-1)+(flip-1)//2)%8, (flip*(x//80-1)+(flip-1)//2)%8
 
+player_colors = ('w', 'b')
 def un(player):
     return 'w' if player == 'b' else 'b'
 

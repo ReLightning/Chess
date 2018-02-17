@@ -16,7 +16,7 @@ def king_moves():
 def queen_moves():
     return rook_moves() + bishop_moves()
 def rook_moves():
-    return ((1,0), (-1,0), (0,1), (0,1))
+    return ((1,0), (-1,0), (0,1), (0,-1))
 def bishop_moves():
     return ((1,1), (-1,1), (1,-1), (-1,-1))
 def knight_moves():
@@ -66,15 +66,14 @@ def possible_pawn_moves_without_shah(field, target, player):
                                                                                 and field[target[0]+2*color][target[1]][0] == '_'))) or
                    (y != 0 and -1<target[1]+y<8 and (field[target[0]+color][target[1]+y][0] == un(player) or
                                take_on_aisle == (un(player), target[1] + y) and (target[0] * color) % 7 == 4))]
-    
-def possible_moves_without_shah(field, target, player):
+
+def possible_kn_moves(field, target, player):
     figure = field[target[0]][target[1]][1]
-    if figure=='p':
-        all_moves = possible_pawn_moves_without_shah(field, target, player)
-        return all_moves
-    if figure == 'n' or figure == 'k':
-        return [(target[0]+nex[0], target[1]+nex[1]) for nex in move_rules[figure]()
-                 if -1<target[0]+nex[0]<8 and -1<target[1]+nex[1]<8 and field[target[0]+nex[0]][target[1]+nex[1]][0] != player]
+    return [(target[0]+nex[0], target[1]+nex[1]) for nex in move_rules[figure]()
+            if -1<target[0]+nex[0]<8 and -1<target[1]+nex[1]<8 and field[target[0]+nex[0]][target[1]+nex[1]][0] != player]
+
+def possible_brq_moves(field, target, player):
+    figure = field[target[0]][target[1]][1]
     pm = [] 
     for nex in (move_rules[figure]()):
         cel = (target[0]+nex[0], target[1]+nex[1])
@@ -83,6 +82,17 @@ def possible_moves_without_shah(field, target, player):
             cel = (cel[0]+nex[0], cel[1]+nex[1])
         if -1<cel[0]<8 and -1<cel[1]<8 and field[cel[0]][cel[1]][0] == un(player):
             pm.append(cel)
+    return pm
+    
+def possible_moves_without_shah(field, target, player):
+    figure = field[target[0]][target[1]][1]
+    if figure=='p':
+        all_moves = possible_pawn_moves_without_shah(field, target, player)
+        return all_moves
+    if figure == 'n' or figure == 'k':
+        all_moves = possible_kn_moves(field, target, player)
+        return all_moves
+    pm = possible_brq_moves(field, target, player)
     return pm
     
 def possible_ordinary_moves(field, target, player, figures):
