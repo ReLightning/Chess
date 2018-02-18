@@ -23,11 +23,10 @@ def det_cell_king(field):
 def det_castling_control(field):
     global castling_control
     for color in ('w', 'b'):
-        scol = col(color)
-        scol = int(3.5-3.5*scol)
-        dk = 0 if field[scol][4] == (color, 'k') else 1
-        dlr = 0 if field[scol][0] == (color, 'r') else 1
-        drr = 0 if field[scol][-1] == (color, 'r') else 1
+        hor = 0 if color == 'w' else 7
+        dk = 0 if field[hor][4] == (color, 'k') else 1
+        dlr = 0 if field[hor][0] == (color, 'r') else 1
+        drr = 0 if field[hor][-1] == (color, 'r') else 1
         castling_control[color] = (dk, dlr, drr)
     return castling_control
     
@@ -37,23 +36,21 @@ def king_and_castling(field, color, old, new, d):
     cell_king[color] = (new[0], new[1])
     storlg=new[1]-old[1]
     if abs(storlg) == 2:
-        if d==1:
-            field[new[0]][new[1]-sign(storlg)] = (color, 'r')
-            field[new[0]][int(3.5+3.5*sign(storlg))] = ('_', '_')
-        if d==-1:
-            field[new[0]][new[1]-sign(storlg)] = ('_', '_')
-            field[new[0]][int(3.5-3.5*sign(storlg))] = (color, 'r')
+        storlg = sign(storlg)
+        rp = 7 if storlg*d == 2 else 0
+        field[new[0]][new[1]-storlg] = (color, 'r') if d == 1 else ('_', '_')
+        field[new[0]][rp] = ('_', '_') if d == 1 else (color, 'r')
         cont = castling_control[color]    
-        castling_control[color] = (cont[0], cont[1]+d*(-sign(storlg)*d+1), cont[2]+d*(sign(storlg)*d+1))
+        castling_control[color] = (cont[0], cont[1]-storlg+d, cont[2]+storlg+d)
     castling_control[color] = (castling_control[color][0]+d, castling_control[color][1], castling_control[color][2])
 
 def rook(field, color, old, new, d):
-    if (old[0] % 7 == 0 and old[1] % 7 == 0 and d == 1) or (new[0] % 7 == 0 and new[1] % 7 == 0 and d == -1):
-        cont = castling_control[color]
-        if (old[0] % 7 == 0 and old[1] % 7 == 0 and d == 1):
-            castling_control[color] = (cont[0], cont[1] + (sign(old[1]-3)+1), cont[2] + (-sign(old[1]-3)+1))
-        if (new[0] % 7 == 0 and new[1] % 7 == 0 and d == -1):
-            castling_control[color] = (cont[0], cont[1] - (sign(new[1]-3)+1), cont[2] - (-sign(new[1]-3)+1))
+    global castling_control
+    hor = 0 if color == 'w' else 7
+    cont = castling_control[color]
+    x, y = old if d == 1 else new
+    if x == hor and y % 7 == 0:
+        castling_control[color] = (cont[0], cont[1] + d*(-sign(y-3)+1), cont[2] + d*(sign(y-3)+1))
 
 def trans_pawn(color, old):
     return True if (old[0] * col(color)) % 7 == 6 else False

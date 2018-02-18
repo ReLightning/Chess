@@ -66,6 +66,7 @@ def testing(position):
     maxdepth = 5
     score2 = alphabeta(position, 5, -1001, 1001)
     print(s)
+    print(score2, bmove)
     return bmove
 
 def testing_testing():

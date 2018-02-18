@@ -61,13 +61,12 @@ def det_shah(field, target, ck, lfig):
     x, y = target
     figure = field[x][y][1]
     color = col(field[x][y][0])
-    if lfig == 'k':
-        if figure == 'p':
-            shah = det_p_shah(color, x, y, ck)
-            return shah
-        if figure == 'n' or figure == 'k':
-            shah = det_kn_shah(figure, x, y, ck)
-            return shah
+    if figure == 'p':
+        shah = det_p_shah(color, x, y, ck)
+        return shah
+    if figure == 'n' or figure == 'k':
+        shah = det_kn_shah(figure, x, y, ck)
+        return shah
     if figure in ('b', 'q', 'r'):
         shah = det_brq_shah(field, figure, x, y, ck)
         return shah
@@ -175,6 +174,7 @@ def possible_castling(field, target, figures, player):
                 field[hor][4-2*side] = ('_','_')
                 field[hor][4-side] = ('_','_')
                 field[hor][4] = (player, 'k')
+                cell_king[player] = (hor, 4)
     return poss_castl
 
 def possible_moves(field, target, player, unfigures):
@@ -185,7 +185,7 @@ def possible_moves(field, target, player, unfigures):
 def exist_moves(field, player, unfigures):
     figures = {(x, y): field[x][y] for x in range(8) for y in range(8) if field[x][y][0]==player}
     for figure in figures:
-        for pm in possible_moves(field, figure, player, unfigures):
+        if possible_moves(field, figure, player, unfigures) != []:
             return True
     return False
 

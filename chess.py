@@ -150,7 +150,7 @@ class graph(cocos.layer.Layer):
             
                                                 
 def demgraph():
-    cocos.director.director.init(width=1000, height=720)
+    cocos.director.director.init(fullscreen=True)
     main_scene = cocos.scene.Scene(graph())
     cocos.director.director.run(main_scene)
         
