@@ -23,11 +23,11 @@ def det_cell_king(field):
 def det_castling_control(field):
     global castling_control
     for color in ('w', 'b'):
-        col = col(color)
-        col = int(3.5-3.5*col)
-        dk = 0 if field[col][4] == (color, 'k') else 1
-        dlr = 0 if field[col][0] == (color, 'r') else 1
-        drr = 0 if field[col][-1] == (color, 'r') else 1
+        scol = col(color)
+        scol = int(3.5-3.5*scol)
+        dk = 0 if field[scol][4] == (color, 'k') else 1
+        dlr = 0 if field[scol][0] == (color, 'r') else 1
+        drr = 0 if field[scol][-1] == (color, 'r') else 1
         castling_control[color] = (dk, dlr, drr)
     return castling_control
     

@@ -24,14 +24,14 @@ def knight_moves():
 def pawn_moves():
     return ((1,0), (2,0), (1,1), (1,-1))
 
-def castling(field):
+def castling(field, player):
     from show_move import castling_control
-    colors = {'w' : 0, 'b' : 7}
-    castl = [(color, side) for color in colors for side in (0, 1)
-             if castling_control[color][0] == 0 and castling_control[color][side+1] == 0 and
-             (side == 0 and field[colors[color]][5][0] == field[colors[color]][6][0] == '_' or
-              side == 1 and field[colors[color]][3][0] == field[colors[color]][2][0] == field[colors[color]][1][0] == '_')]
-    return [(color, ('0-0','0-0-0')[side]) for color, side in castl]
+    hor = 0 if player == 'w' else 7
+    castl = [side for side in (-1, 1)
+             if castling_control[player][0] == 0 and castling_control[player][side] == 0 and
+             (side == -1 and field[hor][5][0] == field[hor][6][0] == '_' or
+              side == 1 and field[hor][3][0] == field[hor][2][0] == field[hor][1][0] == '_')]
+    return castl
              
 
 move_rules = {'k': king_moves,
@@ -49,8 +49,9 @@ value = {'_' : 0,
          'r' : 5,
          'q' : 10}
 
-def check_field_on_shah(field, player, figures, lfig='q'):
-    from show_move import cell_king
+def check_field_on_shah(field, player, figures, lfig='q', cell_king=0):
+    if cell_king == 0:
+        from show_move import cell_king
     for x, y in figures:
         if field[x][y][0] == un(player) and det_shah(field, (x, y), cell_king[player], lfig):
             return True
@@ -60,7 +61,7 @@ def det_shah(field, target, ck, lfig):
     x, y = target
     figure = field[x][y][1]
     color = col(field[x][y][0])
-    if lfig != 'k':
+    if lfig == 'k':
         if figure == 'p':
             shah = det_p_shah(color, x, y, ck)
             return shah
@@ -139,7 +140,8 @@ def possible_ordinary_moves(field, target, player, figures):
         trans = trans_pawn(player, target) and field[target[0]][target[1]][1] == 'p'
         move(field, target, (x, y))
         lfig = field[x][y][1]
-        if not check_field_on_shah(field, player, figures, lfig):
+        from show_move import cell_king
+        if not check_field_on_shah(field, player, figures, lfig, cell_king):
             if not trans:
                 if field[x][y][1] == 'p' and target[1]-y != 0 and fig[0] == '_':
                     poss_ordinary.append((x, y, coords_to_square((x, y))+'a'))
@@ -154,17 +156,25 @@ def possible_ordinary_moves(field, target, player, figures):
 def possible_castling(field, target, figures, player):
     figure = field[target[0]][target[1]][1]
     poss_castl = []
-    for x, y in [(target[0], target[1]+2*(-1)**('0-0', '0-0-0').index(castl)) for castl in ('0-0', '0-0-0') if figure == 'k' and ((player, castl) in castling(field))]:
-        if not check_field_on_shah(field, player, figures):
-            move(field, target, (x, 4+sign(y-4)))
-            if not check_field_on_shah(field, player, figures):
-                move(field, (x, 4+sign(y-4)), target, d=-1)
-                move(field, target, (x, y))
-                if not check_field_on_shah(field, player, figures):
-                    poss_castl.append((x, y, ('0-0', '0-0-0')[(sign(y-4)-1)//2]))
-                move(field, (x, y), target, d=-1)
-            else:
-                move(field, (x, 4+sign(y-4)), target, d=-1)           
+    if figure == 'k':
+        for side in castling(field, player):
+            hor = 0 if player == 'w' else 7
+            from show_move import cell_king
+            if not check_field_on_shah(field, player, figures, 'k', cell_king):
+                field[hor][4] = ('_', '_')
+                field[hor][4-side] = (player, 'k')
+                cell_king[player] = (hor, 4-side)
+                if not check_field_on_shah(field, player, figures, 'k', cell_king):
+                    field[hor][4-side] = ('_', '_')
+                    field[hor][4-2*side] = (player, 'k')
+                    cell_king[player] = (hor, 4-2*side)
+                    if not check_field_on_shah(field, player, figures, 'k', cell_king):
+                        field[hor][4-2*side] = ('_', '_')
+                        field[hor][4] = (player, 'k')
+                        poss_castl.append((hor, 4-2*side, ('','0-0-0', '0-0')[side]))
+                field[hor][4-2*side] = ('_','_')
+                field[hor][4-side] = ('_','_')
+                field[hor][4] = (player, 'k')
     return poss_castl
 
 def possible_moves(field, target, player, unfigures):
