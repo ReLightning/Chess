@@ -60,17 +60,17 @@ class graph(cocos.layer.Layer):
                 interface.button_click(self, 1, self.name, self.pos)
             elif self.red != ():
                 if 800<x<960 and 80<y<660:
-                    self.redactor(x,y)
+                    self.redactor(x, y)
             elif self.activ != (8, 8): 
                 self.chose_cage(x, y)
 
     def on_key_press(self, key, modifiers):
         if key == 65361:
-            num = str(self.numstep-1)+self.player
+            num = str(self.numstep-1)+'_wb'[self.player]
             if num!='0w':
                 interface.fieldsubs(self, num)
         if key == 65363:
-            num = str(self.numstep)+self.player
+            num = str(self.numstep)+'_wb'[self.player]
             if num in self.positions:
                 interface.fieldsubs(self, num)
                 
@@ -82,7 +82,7 @@ class graph(cocos.layer.Layer):
         self.remove(self.sprites[self.activ])
         self.add(self.sprites[self.activ], z=1)
         self.sprites[self.activ].do(Place((x, y)))
-        unfigures = {(x, y): field[x][y] for x in range(8) for y in range(8) if field[x][y][0]==un(self.player)}
+        unfigures = {(x, y) for x in range(8) for y in range(8) if field[x][y]*self.player < 0}
         possibles = possible_moves(field, self.target, self.player, unfigures)
         poss_moves = [possible[:2] for possible in possibles]
         det_moves = [possible[-1] for possible in possibles]
@@ -109,17 +109,17 @@ class graph(cocos.layer.Layer):
             self.sprites[figure].kill()
         self.sprites = {}
         interface.figureadd(self)
-        self.player = 'w'
+        self.player = 1
         self.activ = (8, 8)
         self.numstep = 1
         if self.textview_notation != '':
             self.textview_notation.kill()
             self.textview_notation = ''
         self.notation = []
-        start_parameter_2(par=({'w' : (5, 5),
-                                'b' : (6, 7)},
-                               {'w' : (0, 0, 0),
-                                'b' : (0, 0, 0)},
+        start_parameter_2(par=({1 : (0, 4),
+                                -1 : (7, 4)},
+                               {1 : (0, 0, 0),
+                                -1 : (0, 0, 0)},
                                False,
                                ('l', 8)))
         from show_move import cell_king, castling_control, take_on_aisle
@@ -138,7 +138,7 @@ class graph(cocos.layer.Layer):
         field = self.field
         if 870<x<930 and 635<y<658:
             self.player = un(self.player)
-            t_player = 'Белые' if self.player == 'w' else 'Чёрные'
+            t_player = 'Белые' if self.player == 1 else 'Чёрные'
             self.labels['player'].kill()
             label = cocos.text.Label('Ходят:'+t_player, position=(820,643), color=(0,0,0,255))
             self.add(label)

@@ -9,14 +9,15 @@ import copy
 from engine import testing
 import cProfile
 
-colors = {'w' : 'White-',
-          'b' : 'Black-'}
-figures = {'k': 'King',
-           'q': 'Queen',
-           'r': 'Rook',
-           'b': 'Bishop',
-           'n': 'Knight',
-           'p': 'Pawn'}
+colors = {1 : 'White-',
+          -1 : 'Black-'}
+figures = {6: 'King',
+           5: 'Queen',
+           2: 'Rook',
+           4: 'Bishop',
+           3: 'Knight',
+           1: 'Pawn'}
+
 redcolors = {1 : 'w',
              0 : 'b'}
 redfigures = {0 : 'none',
@@ -32,7 +33,7 @@ actbut = {1 : 'Image/Buttons/noactiv ',
 
 def start_parameter(self):
     self.field = trans_field()
-    self.player = 'w'
+    self.player = 1
     self.numstep = 1
     self.sprites = {}
     self.buttons = {}
@@ -41,7 +42,7 @@ def start_parameter(self):
     self.pos = ()
     self.red = ()
     self.chosen = 'none'
-    self.redfig = ('_','_')
+    self.redfig = 0
     self.flip = 1
     self.activ = (8, 8)
     self.notation = []
@@ -71,10 +72,10 @@ def boardadd(self):
 
 def figureadd(self):
     field = self.field
-    figuras = {(x, y): field[x][y] for x in range(8) for y in range(8) if field[x][y][0]!='_'}
+    figuras = {(x, y) for x in range(8) for y in range(8) if field[x][y] != 0}
     for x, y in figuras:
         figure = field[x][y]
-        sprite = cocos.sprite.Sprite('Image/Figures/'+colors[figure[0]]+figures[figure[1]]+'.png')
+        sprite = cocos.sprite.Sprite('Image/Figures/'+colors[sign(figure)]+figures[abs(figure)]+'.png')
         sprite.position = graph_coord((x, y), self.flip)
         sprite.scale = 0.5
         self.add(sprite, z=0)
@@ -86,7 +87,7 @@ def fieldsubs(self, num):
     self.sprites = {}
     posit = self.positions[num]
     self.field = posit[0]
-    self.player = un(num[-1])
+    self.player = -1 if num[-1] == 'w' else 1
     start_parameter_2(par=posit[1])
     self.numstep = int(num[:-1]) if num[-1] == 'w' else int(num[:-1])+1
     figureadd(self)
@@ -107,9 +108,10 @@ def shelladd(self):
 
 def graph_move(self, det):
     target = self.target
-    beat = self.field[target[0]][target[1]][0]
-    fig = self.field[self.activ[0]][self.activ[1]][1]
-    distin = notation.distinctness(self)
+    beat = sign(self.field[target[0]][target[1]])
+    fig = abs(self.field[self.activ[0]][self.activ[1]])
+    if False:
+        distin = notation.distinctness(self)
     positions = copy.deepcopy(self.positions)
     move(self.field, self.activ, target, trans_fig='q', main=1)
     self.positions = positions
@@ -123,17 +125,11 @@ def graph_move(self, det):
     self.sprites[(target[0], target[1])] = sprite
     self.sprites.pop(self.activ)
     step_deviation(self, det[2:], sprite)
-    self.player = un(self.player)
-    notation.upnotation(self, det, fig, beat, distin)
-    if self.player == 'w':
+    self.player *= -1
+    if False:
+        notation.upnotation(self, det, fig, beat, distin)
+    if self.player == 1:
         self.numstep += 1
-    else:
-        if False:
-            num = self.positions[str(self.numstep)+'w']
-            bmove = testing((num[0],'b',num[1]))
-            self.activ = bmove[0]
-            self.target = bmove[1]
-            graph_move(self, bmove[2])
     self.activ = (8, 8)
     
 def button_click(self, act, name, pos):
@@ -151,7 +147,7 @@ def button_click(self, act, name, pos):
 def det_mate(self):
     field = self.field
     player = self.player
-    unfigures = {(x, y): field[x][y] for x in range(8) for y in range(8) if field[x][y][0]==un(player)}
+    unfigures = {(x, y) for x in range(8) for y in range(8) if field[x][y]*player < 0}
     if not exist_moves(field, player, unfigures):
         if check_field_on_shah(field, player, unfigures):
             label = cocos.text.Label('Мат', font_size=48, position=(400, 400), color=(255,0,0,255))
@@ -198,7 +194,7 @@ def closered(self):
 
 def addpositions(self):
     from show_move import cell_king, castling_control, take_on_aisle
-    self.positions[str(self.numstep)+self.player] = (self.field, (cell_king, castling_control, False, take_on_aisle))
+    self.positions[str(self.numstep)+'_wb'[self.player]] = (self.field, (cell_king, castling_control, False, take_on_aisle))
 
 
         
@@ -210,7 +206,7 @@ def detchosen(self, x, y):
 def click_board(self, x, y):
     self.target = det_target(x, y, self.flip)
     target = self.target
-    if self.field[target[0]][target[1]][0]==self.player:
+    if self.field[target[0]][target[1]]*self.player > 0:
         self.chose_fig(x, y)
         
         

@@ -1,9 +1,10 @@
-cell_king = {'w' : (0, 4),
-             'b' : (7, 4)}
-castling_control = {'w' : (0, 0, 0),
-                    'b' : (0, 0, 0)}
-trans = False
-take_on_aisle = ('l', 8)
+trans_value = {'_' : 0,
+               'k' : 6,
+               'q' : 5,
+               'r' : 2,
+               'b' : 4,
+               'n' : 3,
+               'p' : 1}
 
 def make_field():
     return list(reversed([['br', 'bn', 'bb', 'bq', 'bk', 'bb', 'bn', 'br',],
@@ -16,7 +17,9 @@ def make_field():
                           ['wr', 'wn', 'wb', 'wq', 'wk', 'wb', 'wn', 'wr',]]))
 
 def trans_field():
-    return [[(color, figure) for color, figure in row] for row in make_field()]
+    from math_utilite import col
+    return [[col(color)*trans_value[figure] for color, figure in row] for row in make_field()]
+
 
 def print_field(field): 
     print('\n'.join(reversed([' '.join('{}{}'.format(color, figure) for color, figure in row) for row in field])))

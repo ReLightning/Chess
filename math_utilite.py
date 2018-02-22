@@ -12,7 +12,7 @@ def coords_to_square(target):
 def square_to_coords(square, player):
     if square[2] == '0':
         y = 6 if square == '0-0 ' else 2
-        x = 0 if player == 'w' else 7
+        x = 0 if player == 1 else 7
         nruter = (x, y)
     else:
         nruter = (int(square[1])-1, ord(square[0])-ord('a'))
@@ -23,10 +23,6 @@ def graph_coord(target, flip):
 
 def det_target(x, y, flip):
     return (flip*(y//80-1)+(flip-1)//2)%8, (flip*(x//80-1)+(flip-1)//2)%8
-
-player_colors = ('w', 'b')
-def un(player):
-    return 'w' if player == 'b' else 'b'
 
 def col(player):
     return 1 if player == 'w' else -1

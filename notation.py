@@ -1,5 +1,4 @@
 import cocos
-from math_utilite import un
 from field import print_field
 import interface
 from move import check_field_on_shah, possible_moves_without_shah
@@ -29,7 +28,7 @@ def upnotation(self, det, fig, beat, distins):
     view_notation(self, det)
 
 def det_update(det, fig, target, activ, beat):
-    if fig != 'p':
+    if fig != 1:
         if det[0] != '0':
             det = chr(ord(fig)-32)+det
     else:
@@ -40,12 +39,12 @@ def det_update(det, fig, target, activ, beat):
             det = det[:-1] + chr(ord(det[-1])-32)
         if det[-1] == 'a':
             det = det[:-1]
-    if beat != '_' and fig != 'p':
+    if beat != 0 and fig != 1:
         det = det[0] + '×' + det[1:]
     return det
 
 def det_shah_mate(det, field, player, labels):
-    figures = {(x, y) : field[x][y] for x in range(8) for y in range(8) if field[x][y][0]==un(player)}
+    figures = {(x, y) for x in range(8) for y in range(8) if field[x][y]*player < 0}
     if check_field_on_shah(field, player, figures):
         if 'mate' in labels:
             det += '#'
@@ -66,7 +65,7 @@ def det_distinctness(det, distins, activ):
     return det
 
 def view_notation(self, det):
-    if self.player == 'b':
+    if self.player == -1:
         self.notation.append(str(self.numstep)+'.'+ det)
     else:
         self.notation.append(det)
