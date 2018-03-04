@@ -18,15 +18,13 @@ figures = {6: 'King',
            3: 'Knight',
            1: 'Pawn'}
 
-redcolors = {1 : 'w',
-             0 : 'b'}
-redfigures = {0 : 'none',
-              1 : 'k',
-              2 : 'q',
-              3 : 'r',
-              4 : 'b',
-              5 : 'n',
-              6 : 'p',}
+redfig= {0 : 0,
+         1 : 6,
+         2 : 5,
+         3 : 2,
+         4 : 4,
+         5 : 3,
+         6 : 1,}
 
 actbut = {1 : 'Image/Buttons/noactiv ',
           -1 : 'Image/Buttons/activ '}
@@ -110,10 +108,10 @@ def graph_move(self, det):
     target = self.target
     beat = sign(self.field[target[0]][target[1]])
     fig = abs(self.field[self.activ[0]][self.activ[1]])
-    if False:
+    if True:
         distin = notation.distinctness(self)
     positions = copy.deepcopy(self.positions)
-    move(self.field, self.activ, target, trans_fig='q', main=1)
+    move(self.field, self.activ, target, trans_fig=5, main=1)
     self.positions = positions
     addpositions(self)
     if 'shell' in self.sprites:
@@ -126,7 +124,7 @@ def graph_move(self, det):
     self.sprites.pop(self.activ)
     step_deviation(self, det[2:], sprite)
     self.player *= -1
-    if False:
+    if True:
         notation.upnotation(self, det, fig, beat, distin)
     if self.player == 1:
         self.numstep += 1
@@ -158,6 +156,11 @@ def det_mate(self):
             self.add(label)
             self.labels['mate'] = label
 
+transfig = {'Q' : 5,
+            'R' : 2,
+            'B' : 4,
+            'N' : 3}
+
 def step_deviation(self, det, sprite):
     target = self.target
     if det == '0' or det =='0-0':
@@ -165,15 +168,15 @@ def step_deviation(self, det, sprite):
         sprite.do(Place(graph_coord((self.activ[0], self.activ[1]-len(det)+2), self.flip)))
         self.sprites[(self.activ[0], self.activ[1]-len(det)+2)] = sprite
         self.sprites.pop((target[0], target[1]-(3*len(det)-5)//2))
-    if det in ('q','r','b','n'):
+    if det in ('Q','R','B','N'):
         sprite.kill()
-        sprite = cocos.sprite.Sprite('Image/Figures/'+colors[self.player]+figures[det]+'.png')
+        sprite = cocos.sprite.Sprite('Image/Figures/'+colors[self.player]+figures[transfig[det]]+'.png')
         sprite.position = graph_coord(target, self.flip)
         sprite.scale = 0.5
         self.sprites[target] = sprite
         self.add(sprite)
     if det == 'a':
-        self.sprites.pop((target[0]-sign(ord(self.player) - ord('l')), target[1])).kill()
+        self.sprites.pop((target[0]-self.player, target[1])).kill()
 
 def closered(self):
     ck = det_cell_king(self.field)
@@ -199,9 +202,9 @@ def addpositions(self):
 
         
 def detchosen(self, x, y):            
-    chosen = ((960-x)//80, (640-y)//80)
-    self.redfig = (redcolors[chosen[0]], redfigures[chosen[1]]) if chosen[1] != 0 else ('_','_')
-    self.chosen = 'Image/Figures/'+colors[redcolors[chosen[0]]]+figures[redfigures[chosen[1]]]+'.png' if chosen[1] != 0 else 'none'
+    chosen = (sign(880-x), (640-y)//80)
+    self.redfig = chosen[0]*redfig[chosen[1]]
+    self.chosen = 'Image/Figures/'+colors[chosen[0]]+figures[redfig[chosen[1]]]+'.png' if chosen[1] != 0 else 'none'
 
 def click_board(self, x, y):
     self.target = det_target(x, y, self.flip)

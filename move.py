@@ -60,41 +60,39 @@ def check_field_on_shah(field, player, figures, cell_king=0):
 def det_shah(field, target, ck):
     x, y = target
     figure = abs(field[x][y])
-    color = sign(field[x][y])
-    if figure == 1:
-        shah = det_p_shah(color, x, y, ck)
-        return shah
-    if figure == 3 or figure == 6:
-        shah = det_kn_shah(figure, x, y, ck)
-        return shah
-    if figure in (2, 4, 5):
-        shah = det_brq_shah(field, figure, x, y, ck)
-        return shah
-    return False
+    return shah_fig[figure](x, y, ck, field, figure)
 
-def det_p_shah(color, x, y, ck):
+def det_p_shah(x, y, ck, field, figure):
+    color = sign(field[x][y])
     return (ck[0]-x, abs(ck[1]-y)) == (color, 1)
 
-def det_kn_shah(figure, x, y, ck):
+def det_kn_shah(x, y, ck, field, figure):
     for nex in move_rules[figure]():
         if ck == (x+nex[0], y+nex[1]):
             return True
     return False
 
-def det_brq_shah(field, figure, x, y, ck):
+def det_brq_shah(x, y, ck, field, figure):
     nex = (ck[0] - x, ck[1] - y)
     if nex[0] == 0 or nex[1] == 0 or nex[0]==nex[1] or nex[0]==-nex[1]:
         nex = (sign(nex[0]), sign(nex[1]))
         if nex in move_rules[figure]():
             cel = (x+nex[0], y+nex[1])
             while ck != cel:
-                if field[cel[0]][cel[1]] != 0:
+                if not (-1<cel[0]<8 and -1<cel[1]<8) or field[cel[0]][cel[1]] != 0:
                     return False
                 cel = (cel[0]+nex[0], cel[1]+nex[1])
             return True
     return False
 
-def possible_p_moves(field, target, color):
+shah_fig = {1 : det_p_shah,
+             2 : det_brq_shah,
+             3 : det_kn_shah,
+             4 : det_brq_shah,
+             5 : det_brq_shah,
+             6 : det_kn_shah}
+
+def possible_p_moves(field, target, color, figure):
     from show_move import take_on_aisle
     return [(target[0]+color*x, target[1]+y) for x, y in pawn_moves()
                 if (y == 0 and field[target[0]+color][target[1]] == 0 and (x==1 or
@@ -103,13 +101,11 @@ def possible_p_moves(field, target, color):
                    (y != 0 and -1<target[1]+y<8 and (field[target[0]+color][target[1]+y] * color < 0) or
                                take_on_aisle == (-color, target[1] + y) and (target[0] * color) % 7 == 4)]
 
-def possible_kn_moves(field, target, player):
-    figure = abs(field[target[0]][target[1]])
+def possible_kn_moves(field, target, player, figure):
     return [(target[0]+nex[0], target[1]+nex[1]) for nex in move_rules[figure]()
             if -1<target[0]+nex[0]<8 and -1<target[1]+nex[1]<8 and field[target[0]+nex[0]][target[1]+nex[1]]*player <= 0]
 
-def possible_brq_moves(field, target, player):
-    figure = abs(field[target[0]][target[1]])
+def possible_brq_moves(field, target, player, figure):
     pm = [] 
     for nex in (move_rules[figure]()):
         cel = (target[0]+nex[0], target[1]+nex[1])
@@ -119,17 +115,17 @@ def possible_brq_moves(field, target, player):
         if -1<cel[0]<8 and -1<cel[1]<8 and field[cel[0]][cel[1]]*player < 0:
             pm.append(cel)
     return pm
-    
+
+moves_fig = {1 : possible_p_moves,
+             2 : possible_brq_moves,
+             3 : possible_kn_moves,
+             4 : possible_brq_moves,
+             5 : possible_brq_moves,
+             6 : possible_kn_moves}
+
 def possible_moves_without_shah(field, target, player):
     figure = abs(field[target[0]][target[1]])
-    if figure==1:
-        all_moves = possible_p_moves(field, target, player)
-        return all_moves
-    if figure == 3 or figure == 6:
-        all_moves = possible_kn_moves(field, target, player)
-        return all_moves
-    all_moves = possible_brq_moves(field, target, player)
-    return all_moves
+    return moves_fig[figure](field, target, player, figure)
     
 def possible_ordinary_moves(field, target, player, figures):
     poss_ordinary = []
@@ -145,7 +141,7 @@ def possible_ordinary_moves(field, target, player, figures):
                 else:
                     poss_ordinary.append((x, y, coords_to_square((x, y))))
             else:
-               for pot_fig in ('q','r','b','n'):
+               for pot_fig in ('Q','R','N','B'):
                    poss_ordinary.append((x, y, coords_to_square((x, y))+pot_fig))
         move(field, (x, y), target, fig, -1)
     return poss_ordinary
@@ -181,15 +177,15 @@ def possible_moves(field, target, player, unfigures):
     return poss_ordinary + poss_castl
 
 def exist_moves(field, player, unfigures):
-    figures = {(x, y) for x in range(8) for y in range(8) if field[x][y]*player > 0}
+    figures = [(x, y) for x in range(8) for y in range(8) if field[x][y]*player > 0]
     for figure in figures:
         if possible_moves(field, figure, player, unfigures) != []:
             return True
     return False
 
 def all_possible_moves(field, player):
-    figures = {(x, y) for x in range(8) for y in range(8) if field[x][y]*player > 0}
-    unfigures = {(x, y) for x in range(8) for y in range(8) if field[x][y]*player < 0}
+    figures = [(x, y) for x in range(8) for y in range(8) if field[x][y]*player > 0]
+    unfigures = [(x, y) for x in range(8) for y in range(8) if field[x][y]*player < 0]
     apm = []
     for target in figures:
         for tpm in possible_moves(field, target, player, unfigures):
@@ -204,7 +200,7 @@ def sortka(apm):
     return apm
 
 def field_legal(field, player):
-    figures = {(x, y) for x in range(8) for y in range(8) if field[x][y]*player > 0}
+    figures = [(x, y) for x in range(8) for y in range(8) if field[x][y]*player > 0]
     kings = [sign(field[x][y]) for x in range(8) for y in range(8) if abs(field[x][y])==6]
     return (kings == [1, -1] or kings == [-1, 1]) and not check_field_on_shah(field, -player, figures)
 

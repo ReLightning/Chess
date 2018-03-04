@@ -126,7 +126,7 @@ class graph(cocos.layer.Layer):
         self.positions = {'0b' : (trans_field(), (cell_king, castling_control, False, take_on_aisle))}
 
     def butredactor(self):
-        t_player = 'Белые' if self.player == 'w' else 'Чёрные'
+        t_player = 'Белые' if self.player == 1 else 'Чёрные'
         self.red = cocos.sprite.Sprite('Image/Utilites/Edit-Figure.png')
         self.red.position = 880, 368
         label = cocos.text.Label(text='Ходят:'+t_player, position=(820,643), color=(0,0,0,255))
@@ -137,7 +137,7 @@ class graph(cocos.layer.Layer):
     def redactor(self, x, y):
         field = self.field
         if 870<x<930 and 635<y<658:
-            self.player = un(self.player)
+            self.player *= -1
             t_player = 'Белые' if self.player == 1 else 'Чёрные'
             self.labels['player'].kill()
             label = cocos.text.Label('Ходят:'+t_player, position=(820,643), color=(0,0,0,255))

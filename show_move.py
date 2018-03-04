@@ -73,7 +73,7 @@ def take_on_aisle_move(field, color, old, new, fig, d, main):
         if fig == 0 and d == -1:
             field[new[0]][old[1]] = -color
 
-def move(field, old, new, fig=0, d=1, trans_fig='p', main=0):
+def move(field, old, new, fig=0, d=1, trans_fig=1, main=0):
     global trans, take_on_aisle
     color = sign(field[old[0]][old[1]])
     figure = abs(field[old[0]][old[1]])
@@ -93,5 +93,6 @@ def move(field, old, new, fig=0, d=1, trans_fig='p', main=0):
         trans = False
     field[new[0]][new[1]] = color*figure
     field[old[0]][old[1]] = fig
+
 
 

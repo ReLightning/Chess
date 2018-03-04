@@ -3,6 +3,11 @@ from field import print_field
 import interface
 from move import check_field_on_shah, possible_moves_without_shah
 
+notval = {2 : 'R',
+          3 : 'N',
+          4 : 'B',
+          5 : 'Q',
+          6 : 'K',}
 
 def makepgn(self):
     file = open('Утилиты/standart.txt')
@@ -30,13 +35,11 @@ def upnotation(self, det, fig, beat, distins):
 def det_update(det, fig, target, activ, beat):
     if fig != 1:
         if det[0] != '0':
-            det = chr(ord(fig)-32)+det
+            det = notval[fig]+det
     else:
         if target[1] - activ[1] !=0:
             det = 'abcdefgh'[activ[1]] + det[:3]
             det = det[0] + '×' + det[1:]
-        if det[-1] in ('q','r','b','n'):
-            det = det[:-1] + chr(ord(det[-1])-32)
         if det[-1] == 'a':
             det = det[:-1]
     if beat != 0 and fig != 1:
@@ -80,7 +83,7 @@ def view_notation(self, det):
 def distinctness(self):
     distins = []
     fig = self.field[self.activ[0]][self.activ[1]]
-    if not fig[1] in ('k', 'p'):
+    if not abs(fig) in (6, 1):
         distin = [(x, y) for x in range(8) for y in range(8) if self.field[x][y] == fig]
         for figure in distin:
             if self.target in possible_moves_without_shah(self.field, figure, self.player) and figure != self.activ:

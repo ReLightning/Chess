@@ -1,10 +1,7 @@
+from timeit import timeit
+
 def sign(a):
-    if a==0:
-        return 0
-    if a>0:
-        return 1
-    else:
-        return -1
+    return 1 if a>0 else -1 if a<0 else 0
     
 def coords_to_square(target):
     return 'abcdefgh'[target[1]]+str(target[0]+1)
@@ -26,4 +23,10 @@ def det_target(x, y, flip):
 
 def col(player):
     return 1 if player == 'w' else -1
+
+
+
+
+
+
 

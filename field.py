@@ -1,3 +1,4 @@
+from math_utilite import sign
 trans_value = {'_' : 0,
                'k' : 6,
                'q' : 5,
@@ -22,7 +23,9 @@ def trans_field():
 
 
 def print_field(field): 
-    print('\n'.join(reversed([' '.join('{}{}'.format(color, figure) for color, figure in row) for row in field])))
+    print('\n'.join(reversed([' '.join('{}'.format('_wb'[sign(fig)]+'_prnbqk'[abs(fig)]) for fig in row) for row in field])))
+
+
 
 
             
