@@ -2,6 +2,7 @@ from math_utilite import sign, coords_to_square, col
 from field import print_field
 from show_move import *
 
+
 def start_parameter_1():
     global cell_king, castling_control, trans, take_on_aisle
     cell_king = {1 : (0, 4),
@@ -49,17 +50,16 @@ value = {0 : 0,
          2 : 5,
          5 : 10}
 
-def check_field_on_shah(field, player, figures, cell_king=0):
+def check_field_on_shah(field, player, figures, cell_king=0, kf=(8, 8)):
     if cell_king == 0:
         from show_move import cell_king
-    for x, y in figures:
-        if field[x][y] * player < 0 and det_shah(field, (x, y), cell_king[player]):
+    for targ in figures:
+        if det_shah(field, targ, cell_king[player], abs(figures[targ])):
             return True
     return False
 
-def det_shah(field, target, ck):
+def det_shah(field, target, ck, figure):
     x, y = target
-    figure = abs(field[x][y])
     return shah_fig[figure](x, y, ck, field, figure)
 
 def det_p_shah(x, y, ck, field, figure):
@@ -85,7 +85,7 @@ def det_brq_shah(x, y, ck, field, figure):
             return True
     return False
 
-shah_fig = {1 : det_p_shah,
+shah_fig = { 1 : det_p_shah,
              2 : det_brq_shah,
              3 : det_kn_shah,
              4 : det_brq_shah,
@@ -134,6 +134,9 @@ def possible_ordinary_moves(field, target, player, figures):
         trans = trans_pawn(player, target) and abs(field[target[0]][target[1]]) == 1
         move(field, target, (x, y))
         from show_move import cell_king
+        beat = (x, y) in figures
+        if beat:
+            del figures[(x, y)]
         if not check_field_on_shah(field, player, figures, cell_king):
             if not trans:
                 if abs(field[x][y]) == 1 and target[1]-y != 0 and fig == 0:
@@ -144,6 +147,8 @@ def possible_ordinary_moves(field, target, player, figures):
                for pot_fig in ('Q','R','N','B'):
                    poss_ordinary.append((x, y, coords_to_square((x, y))+pot_fig))
         move(field, (x, y), target, fig, -1)
+        if beat:
+            figures[(x, y)] = field[x][y]
     return poss_ordinary
 
 def possible_castling(field, target, figures, player):
@@ -177,15 +182,15 @@ def possible_moves(field, target, player, unfigures):
     return poss_ordinary + poss_castl
 
 def exist_moves(field, player, unfigures):
-    figures = [(x, y) for x in range(8) for y in range(8) if field[x][y]*player > 0]
-    for figure in figures:
-        if possible_moves(field, figure, player, unfigures) != []:
+    figures = [(x, y) for x, row in enumerate(field) for y, fig in enumerate(row) if fig*player > 0]
+    for fig in figures:
+        if possible_moves(field, fig, player, unfigures) != []:
             return True
     return False
 
 def all_possible_moves(field, player):
-    figures = [(x, y) for x in range(8) for y in range(8) if field[x][y]*player > 0]
-    unfigures = [(x, y) for x in range(8) for y in range(8) if field[x][y]*player < 0]
+    figures = [(x, y) for x, row in enumerate(field) for y, fig in enumerate(row) if fig*player > 0]
+    unfigures = {(x, y):fig for x, row in enumerate(field) for y, fig in enumerate(row) if fig*player < 0}
     apm = []
     for target in figures:
         for tpm in possible_moves(field, target, player, unfigures):
@@ -200,7 +205,7 @@ def sortka(apm):
     return apm
 
 def field_legal(field, player):
-    figures = [(x, y) for x in range(8) for y in range(8) if field[x][y]*player > 0]
+    figures = {(x, y): fig for x, row in enumerate(field) for y, fig in enumerate(row) if fig*player > 0}
     kings = [sign(field[x][y]) for x in range(8) for y in range(8) if abs(field[x][y])==6]
     return (kings == [1, -1] or kings == [-1, 1]) and not check_field_on_shah(field, -player, figures)
 

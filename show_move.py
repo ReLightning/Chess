@@ -1,6 +1,5 @@
 from field import print_field
 from math_utilite import sign, col
-import copy
 
 
 def start_parameter_2(par = ({1 : (0, 4),

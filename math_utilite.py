@@ -1,5 +1,6 @@
 from timeit import timeit
 
+
 def sign(a):
     return 1 if a>0 else -1 if a<0 else 0
     

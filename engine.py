@@ -5,17 +5,18 @@ from field import trans_field, print_field, make_field
 import cProfile
 
 value = {6 : 0,
-         1 : 1,
-         3 : 2.5,
-         4 : 3,
-         2 : 5,
-         5 : 10}
+         1 : 100,
+         3 : 200,
+         4 : 300,
+         2 : 500,
+         5 : 900}
+
 
 def evaluation(position):
     field = position[0]
     player = position[1]
-    w_figures = [field[x][y] for x in range(8) for y in range(8) if field[x][y] > 0]
-    b_figures = [field[x][y] for x in range(8) for y in range(8) if field[x][y] < 0]
+    w_figures = [fig for x, row in enumerate(field) for y, fig in enumerate(row) if fig > 0]
+    b_figures = [fig for x, row in enumerate(field) for y, fig in enumerate(row) if fig < 0]
     figures = [w_figures.count(fig)-b_figures.count(-fig) for fig in range(1,7)]
     evaluate = 0
     for fig, kilk in enumerate(figures,1):
@@ -45,7 +46,7 @@ def alphabeta(position, depth, alpha, beta):
                 alpha = tmp
                 if depth == maxdepth:
                     bmove = pos
-    figures = [(x, y) for x in range(8) for y in range(8) if field[x][y]*player < 0]  
+    figures = {(x, y):fig for x, row in enumerate(field) for y, fig in enumerate(row) if fig*player < 0}
     if possibles != [] or check_field_on_shah(field, player, figures):
         return alpha
     else:
@@ -67,11 +68,12 @@ def testing(position):
     global maxdepth, bmove, s
     bmove = 0
     s = 0
+    player = position[1]
     start_parameter_2(position[2])
-    maxdepth = 4
+    maxdepth = 5
     score2 = alphabeta(position, maxdepth, -1001, 1001)
     print(s)
-    print(score2, bmove)
+    print(score2*player, bmove)
     return bmove
 
 def testing_testing():
@@ -83,6 +85,8 @@ def testing_testing():
                                         ('l', 8))))
 if __name__=='__main__':   
     cProfile.run('testing_testing()')
+
+
 
 
 

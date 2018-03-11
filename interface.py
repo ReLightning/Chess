@@ -108,8 +108,7 @@ def graph_move(self, det):
     target = self.target
     beat = sign(self.field[target[0]][target[1]])
     fig = abs(self.field[self.activ[0]][self.activ[1]])
-    if True:
-        distin = notation.distinctness(self)
+    distin = notation.distinctness(self)
     positions = copy.deepcopy(self.positions)
     move(self.field, self.activ, target, trans_fig=5, main=1)
     self.positions = positions
@@ -124,8 +123,7 @@ def graph_move(self, det):
     self.sprites.pop(self.activ)
     step_deviation(self, det[2:], sprite)
     self.player *= -1
-    if True:
-        notation.upnotation(self, det, fig, beat, distin)
+    notation.upnotation(self, det, fig, beat, distin)
     if self.player == 1:
         self.numstep += 1
     self.activ = (8, 8)
@@ -145,7 +143,7 @@ def button_click(self, act, name, pos):
 def det_mate(self):
     field = self.field
     player = self.player
-    unfigures = {(x, y) for x in range(8) for y in range(8) if field[x][y]*player < 0}
+    unfigures = {(x, y):fig for x, row in enumerate(field) for y, fig in enumerate(row) if fig*player < 0}
     if not exist_moves(field, player, unfigures):
         if check_field_on_shah(field, player, unfigures):
             label = cocos.text.Label('Мат', font_size=48, position=(400, 400), color=(255,0,0,255))

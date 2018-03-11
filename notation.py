@@ -47,7 +47,7 @@ def det_update(det, fig, target, activ, beat):
     return det
 
 def det_shah_mate(det, field, player, labels):
-    figures = {(x, y) for x in range(8) for y in range(8) if field[x][y]*player < 0}
+    figures = {(x, y):fig for x, row in enumerate(field) for y, fig in enumerate(row) if fig*player < 0}
     if check_field_on_shah(field, player, figures):
         if 'mate' in labels:
             det += '#'
