@@ -56,6 +56,7 @@ def start_graph(self):
     button_click(self, 1, 'Заново', (120, 40))
     button_click(self, 1, 'Редактор', (240, 40))
     button_click(self, 1, 'Сохранить', (360, 40))
+    button_click(self, 1, 'Старт', (480, 40))
     notation.start_notation(self)
     
 def flipboard(self, flip):

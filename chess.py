@@ -30,6 +30,8 @@ class graph(cocos.layer.Layer):
                     interface.button_click(self, -1, 'Редактор', (240, 40))
                 if 305<=x<=420 and 22<=y<=50:
                     interface.button_click(self, -1, 'Сохранить', (360, 40))
+                if 425<=x<=540 and 22<=y<=50:
+                    interface.button_click(self, -1, 'Старт', (480, 40))
             else:
                 if 80<=x<=720 and 80<=y<=720:
                     self.target = det_target(x, y, self.flip)
@@ -56,7 +58,9 @@ class graph(cocos.layer.Layer):
                 if 185<x<300 and 22<y<50 and self.name == 'Редактор':
                     self.butredactor()
                 if 305<=x<=420 and 22<=y<=50 and self.name == 'Сохранить':
-                    notation.makepgn(self) 
+                    notation.makepgn(self)
+                if 425<=x<=540 and 22<=y<=50 and self.name == 'Старт':
+                    notation.load_start_position(self)
                 interface.button_click(self, 1, self.name, self.pos)
             elif self.red != ():
                 if 800<x<960 and 80<y<660:

@@ -90,6 +90,13 @@ def distinctness(self):
                 distins.append(figure)
         return distins
     else:
+
         return []
+    
+def load_start_position(self):
+    file = open('Утилиты/start_position.txt', 'w')
+    sp = print_field(self.field)
+    file.write(sp)
+    
         
     

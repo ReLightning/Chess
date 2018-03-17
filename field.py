@@ -8,22 +8,20 @@ trans_value = {'_' : 0,
                'p' : 1}
 
 def make_field():
-    return list(reversed([['br', 'bn', 'bb', 'bq', 'bk', 'bb', 'bn', 'br',],
-                          ['bp', 'bp', 'bp', 'bp', 'bp', 'bp', 'bp', 'bp',],
-                          ['__', '__', '__', '__', '__', '__', '__', '__',],
-                          ['__', '__', '__', '__', '__', '__', '__', '__',],
-                          ['__', '__', '__', '__', '__', '__', '__', '__',],
-                          ['__', '__', '__', '__', '__', '__', '__', '__',],
-                          ['wp', 'wp', 'wp', 'wp', 'wp', 'wp', 'wp', 'wp',],
-                          ['wr', 'wn', 'wb', 'wq', 'wk', 'wb', 'wn', 'wr',]]))
+    file = open('Утилиты/start_position.txt')
+    r = file.read()
+    sp = [[fig for fig in row.split(' ')] for row in r.split('\n')]
+    return list(reversed(sp))
 
 def trans_field():
     from math_utilite import col
     return [[col(color)*trans_value[figure] for color, figure in row] for row in make_field()]
 
 
-def print_field(field): 
-    print('\n'.join(reversed([' '.join('{}'.format('_wb'[sign(fig)]+'_prnbqk'[abs(fig)]) for fig in row) for row in field])))
+def print_field(field):
+    pos = '\n'.join(reversed([' '.join('{}'.format('_wb'[sign(fig)]+'_prnbqk'[abs(fig)]) for fig in row) for row in field]))
+    print(pos)
+    return pos
 
 
 

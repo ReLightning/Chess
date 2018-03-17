@@ -6,7 +6,7 @@ import cProfile
 
 value = {6 : 0,
          1 : 100,
-         3 : 200,
+         3 : 300,
          4 : 300,
          2 : 500,
          5 : 900}
@@ -70,10 +70,10 @@ def testing(position):
     s = 0
     player = position[1]
     start_parameter_2(position[2])
-    maxdepth = 5
+    maxdepth = 6
     score2 = alphabeta(position, maxdepth, -1001, 1001)
     print(s)
-    print(score2*player, bmove)
+    print(score2*player / 100, bmove)
     return bmove
 
 def testing_testing():
