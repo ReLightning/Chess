@@ -2,6 +2,7 @@ import cocos
 from field import print_field
 import interface
 from move import check_field_on_shah, possible_moves_without_shah
+from math_utilite import det_myfigures
 
 notval = {2 : 'R',
           3 : 'N',

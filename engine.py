@@ -11,7 +11,7 @@ value = {6 : 0,
          2 : 500,
          5 : 900}
 
-w_pawn = [[ 0, 0, 0, 0, 0, 0 ,0 ,0],
+w_pawn = [[ 0, 0, 0, 0, 0, 0, 0 ,0],
           [ 4, 4, 4, 0, 0, 4, 4, 4],
           [ 6, 8, 2,10,10, 2, 8, 6],
           [ 6, 8,12,16,16,12, 8, 6],
@@ -22,6 +22,43 @@ w_pawn = [[ 0, 0, 0, 0, 0, 0 ,0 ,0],
 
 b_pawn = list(reversed(w_pawn))
 
+knight = [[ 0, 4, 8,10,10, 8, 4, 0],
+            [ 4, 8,16,20,20,16, 8, 4],
+            [ 8,16,24,28,28,24,16, 8],
+            [10,20,28,32,32,28,20,10],
+            [10,20,28,32,32,28,20,10],
+            [ 8,16,24,28,28,24,16, 8],
+            [ 4, 8,16,20,20,16, 8, 4],
+            [ 0, 4, 8,10,10, 8, 4, 0]]
+
+
+bishop = [[14,14,14,14,14,14,14,14],
+            [14,22,18,18,18,18,22,14],
+            [14,18,22,22,22,22,18,14],
+            [14,18,22,22,22,22,18,14],
+            [14,18,22,22,22,22,18,14],
+            [14,18,22,22,22,22,18,14],
+            [14,22,18,18,18,18,22,14],
+            [14,14,14,14,14,14,14,14]]
+
+
+king1 = [[  0,  0, -4,-10,-10, -4,  0,  0],
+           [ -4, -4, -8,-12,-12, -8, -4, -4],
+           [-12,-16,-20,-20,-20,-20,-16,-12],
+           [-16,-20,-24,-24,-24,-24,-20,-16],
+           [-16,-20,-24,-24,-24,-24,-20,-16],
+           [-12,-16,-20,-20,-20,-20,-16,-12],
+           [ -4, -4, -8,-12,-12, -8, -4, -4],
+           [  0,  0, -4,-10,-10, -4,  0,  0]]
+
+trans = {1 : w_pawn,
+         -1: b_pawn,
+         3 : knight,
+         -3: knight,
+         4 : bishop,
+         -4: bishop,
+         6 : king1,
+         -6: king1}
 
 def evaluation(position):
     field = position[0]
@@ -35,11 +72,11 @@ def evaluation(position):
     for fig, kilk in enumerate(figures,1):
         evaluate += kilk*value[abs(fig)]
     for c in w_figures:
-        if w_figures[c] == 1:
-            evaluate += w_pawn[c[0]][c[1]]
+        if w_figures[c] in (1,3,4,6):
+            evaluate += trans[w_figures[c]][c[0]][c[1]]
     for c in b_figures:
-        if b_figures[c] == -1:
-            evaluate -= b_pawn[c[0]][c[1]]
+        if b_figures[c] in (-1,-3,-4,-6):
+            evaluate -= trans[b_figures[c]][c[0]][c[1]]
     return evaluate*player
 
 
@@ -89,8 +126,8 @@ def testing(position):
     s = 0
     player = position[1]
     start_parameter_2(position[2])
-    maxdepth = 3
-    score2 = alphabeta(position, maxdepth, -1001, 1001)
+    maxdepth = 2
+    score2 = alphabeta(position, maxdepth, -100001, 100001)
     print(s)
     print(score2*player / 100, bmove)
     return bmove

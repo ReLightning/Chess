@@ -127,6 +127,13 @@ def graph_move(self, det):
     notation.upnotation(self, det, fig, beat, distin)
     if self.player == 1:
         self.numstep += 1
+    else:
+        if True:
+            num = self.positions[str(self.numstep)+'w'] 
+            bmove = testing((num[0],-1,num[1])) 
+            self.activ = bmove[0] 
+            self.target = bmove[1] 
+            graph_move(self, bmove[2])
     self.activ = (8, 8)
     
 def button_click(self, act, name, pos):
