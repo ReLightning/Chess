@@ -18,10 +18,12 @@ def trans_field():
     return [[col(color)*trans_value[figure] for color, figure in row] for row in make_field()]
 
 
-def print_field(field):
+def print_field(field, k=0):
     pos = '\n'.join(reversed([' '.join('{}'.format('_wb'[sign(fig)]+'_prnbqk'[abs(fig)]) for fig in row) for row in field]))
-    print(pos)
-    return pos
+    if k == 0:
+        print(pos)
+    else:
+        return pos
 
 
 

@@ -1,4 +1,4 @@
-from math_utilite import sign, coords_to_square, col
+from math_utilite import sign, coords_to_square, col, det_myfigures
 from field import print_field
 from show_move import *
 
@@ -190,7 +190,7 @@ def exist_moves(field, player, unfigures):
 
 def all_possible_moves(field, player):
     figures = [(x, y) for x, row in enumerate(field) for y, fig in enumerate(row) if fig*player > 0]
-    unfigures = {(x, y):fig for x, row in enumerate(field) for y, fig in enumerate(row) if fig*player < 0}
+    unfigures = det_myfigures(field, -player)
     apm = []
     for target in figures:
         for tpm in possible_moves(field, target, player, unfigures):
@@ -205,7 +205,7 @@ def sortka(apm):
     return apm
 
 def field_legal(field, player):
-    figures = {(x, y): fig for x, row in enumerate(field) for y, fig in enumerate(row) if fig*player > 0}
+    figures = det_myfigures(field, player)
     kings = [sign(field[x][y]) for x in range(8) for y in range(8) if abs(field[x][y])==6]
     return (kings == [1, -1] or kings == [-1, 1]) and not check_field_on_shah(field, -player, figures)
 

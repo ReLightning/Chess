@@ -47,8 +47,8 @@ def det_update(det, fig, target, activ, beat):
     return det
 
 def det_shah_mate(det, field, player, labels):
-    figures = {(x, y):fig for x, row in enumerate(field) for y, fig in enumerate(row) if fig*player < 0}
-    if check_field_on_shah(field, player, figures):
+    unfigures = det_myfigures(field, -player)
+    if check_field_on_shah(field, player, unfigures):
         if 'mate' in labels:
             det += '#'
         else:
@@ -95,7 +95,7 @@ def distinctness(self):
     
 def load_start_position(self):
     file = open('Утилиты/start_position.txt', 'w')
-    sp = print_field(self.field)
+    sp = print_field(self.field, 1)
     file.write(sp)
     
         

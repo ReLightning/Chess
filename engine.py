@@ -1,4 +1,4 @@
-from math_utilite import sign, col
+from math_utilite import sign, col, det_myfigures
 from move import all_possible_moves, exist_moves, check_field_on_shah
 from show_move import start_parameter_2, move
 from field import trans_field, print_field, make_field
@@ -11,16 +11,35 @@ value = {6 : 0,
          2 : 500,
          5 : 900}
 
+w_pawn = [[ 0, 0, 0, 0, 0, 0 ,0 ,0],
+          [ 4, 4, 4, 0, 0, 4, 4, 4],
+          [ 6, 8, 2,10,10, 2, 8, 6],
+          [ 6, 8,12,16,16,12, 8, 6],
+          [ 8,12,16,24,24,16,12, 8],
+          [12,16,24,32,32,24,16,12],
+          [12,16,24,32,32,24,16,12],
+          [ 0, 0, 0, 0, 0, 0, 0, 0]]
+
+b_pawn = list(reversed(w_pawn))
+
 
 def evaluation(position):
     field = position[0]
     player = position[1]
-    w_figures = [fig for x, row in enumerate(field) for y, fig in enumerate(row) if fig > 0]
-    b_figures = [fig for x, row in enumerate(field) for y, fig in enumerate(row) if fig < 0]
-    figures = [w_figures.count(fig)-b_figures.count(-fig) for fig in range(1,7)]
+    w_figures = det_myfigures(field, 1)
+    b_figures = det_myfigures(field, -1)
+    w_figs = [fig for fig in w_figures.values()]
+    b_figs = [fig for fig in b_figures.values()]
+    figures = [w_figs.count(fig)-b_figs.count(-fig) for fig in range(1,7)]
     evaluate = 0
     for fig, kilk in enumerate(figures,1):
         evaluate += kilk*value[abs(fig)]
+    for c in w_figures:
+        if w_figures[c] == 1:
+            evaluate += w_pawn[c[0]][c[1]]
+    for c in b_figures:
+        if b_figures[c] == -1:
+            evaluate -= b_pawn[c[0]][c[1]]
     return evaluate*player
 
 
@@ -46,8 +65,8 @@ def alphabeta(position, depth, alpha, beta):
                 alpha = tmp
                 if depth == maxdepth:
                     bmove = pos
-    figures = {(x, y):fig for x, row in enumerate(field) for y, fig in enumerate(row) if fig*player < 0}
-    if possibles != [] or check_field_on_shah(field, player, figures):
+    unfigures = det_myfigures(field, -player)
+    if possibles != [] or check_field_on_shah(field, player, unfigures):
         return alpha
     else:
         return 0         
@@ -70,7 +89,7 @@ def testing(position):
     s = 0
     player = position[1]
     start_parameter_2(position[2])
-    maxdepth = 6
+    maxdepth = 3
     score2 = alphabeta(position, maxdepth, -1001, 1001)
     print(s)
     print(score2*player / 100, bmove)

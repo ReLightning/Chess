@@ -25,7 +25,14 @@ def det_target(x, y, flip):
 def col(player):
     return 1 if player == 'w' else -1
 
+def det_figures(field):
+    return {(x, y): fig for x, row in enumerate(field) for y, fig in enumerate(row) if fig != 0}
 
+def det_myfigures(field, player):
+    return {(x, y): fig for x, row in enumerate(field) for y, fig in enumerate(row) if fig*player > 0}
+
+
+    
 
 
 
