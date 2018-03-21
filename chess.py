@@ -39,7 +39,7 @@ class graph(cocos.layer.Layer):
                     if target in self.sprites:
                         self.sprites.pop(target).kill()
                     if self.chosen != 'none':
-                        interface.figadd(self)
+                        interface.redfigadd(self)
                     field[target[0]][target[1]] = self.redfig
         if buttons == 4 and 80<=x<=720 and 80<=y<=720:
             interface.flipboard(self, self.flip)
@@ -150,7 +150,7 @@ class graph(cocos.layer.Layer):
         if 943<x<960 and 639<y<658:
             interface.closered(self)
         if 800<x<960 and 80<y<640:
-            interface.detchosen(self, x, y)
+            interface.det_chosen(self, x, y)
             
                                                 
 def demgraph():

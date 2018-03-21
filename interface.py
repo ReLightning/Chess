@@ -30,21 +30,13 @@ actbut = {1 : 'Image/Buttons/noactiv ',
           -1 : 'Image/Buttons/activ '}
 
 def start_parameter(self):
-    self.field = trans_field()
-    self.player = 1
+    self.field, self.player = trans_field(), 1
     self.numstep = 1
-    self.sprites = {}
-    self.buttons = {}
-    self.labels = {}
-    self.name = ''
-    self.pos = ()
-    self.red = ()
-    self.chosen = 'none'
-    self.redfig = 0
-    self.flip = 1
-    self.activ = (8, 8)
-    self.notation = []
-    self.textview_notation = ''
+    self.sprites, self.buttons, self.labels = {}, {}, {}
+    self.name, self.pos = '', ()
+    self.red, self.chosen, self.redfig = (), 'none', 0
+    self.flip, self.activ = 1, (8, 8)
+    self.notation, self.textview_notation = [], ''
     start_parameter_2()
     from show_move import cell_king, castling_control, take_on_aisle
     self.positions = {'0b' : (trans_field(), (cell_king, castling_control, False, take_on_aisle))}
@@ -70,16 +62,16 @@ def boardadd(self):
     self.add(sprite, z=0)
 
 def figureadd(self):
-    field = self.field
-    figuras = {(x, y) for x in range(8) for y in range(8) if field[x][y] != 0}
-    for x, y in figuras:
-        figure = field[x][y]
-        sprite = cocos.sprite.Sprite('Image/Figures/'+colors[sign(figure)]+figures[abs(figure)]+'.png')
-        sprite.position = graph_coord((x, y), self.flip)
+    figs = det_figures(self.field)
+    for cell in figs:
+        fig = figs[cell]
+        sprite = cocos.sprite.Sprite('Image/Figures/'+colors[sign(fig)]+figures[abs(fig)]+'.png')
+        sprite.position = graph_coord(cell, self.flip)
         sprite.scale = 0.5
         self.add(sprite, z=0)
-        self.sprites[(x, y)] = sprite
-
+        self.sprites[cell] = sprite
+        
+#?
 def fieldsubs(self, num):
     for figure in self.sprites:
         self.sprites[figure].kill()
@@ -92,7 +84,7 @@ def fieldsubs(self, num):
     figureadd(self)
     
     
-def figadd(self):
+def redfigadd(self):
     sprite = cocos.sprite.Sprite(self.chosen)
     sprite.position = graph_coord(self.target, self.flip)
     sprite.scale = 0.5
@@ -105,6 +97,7 @@ def shelladd(self):
     self.sprites['shell'] = sprite
     self.add(sprite, z=0)
 
+#?
 def graph_move(self, det):
     target = self.target
     beat = sign(self.field[target[0]][target[1]])
@@ -128,7 +121,7 @@ def graph_move(self, det):
     if self.player == 1:
         self.numstep += 1
     else:
-        if True:
+        if False:
             num = self.positions[str(self.numstep)+'w'] 
             bmove = testing((num[0],-1,num[1])) 
             self.activ = bmove[0] 
@@ -137,17 +130,13 @@ def graph_move(self, det):
     self.activ = (8, 8)
     
 def button_click(self, act, name, pos):
-    sprite = cocos.sprite.Sprite(actbut[act]+name+ '.png')
+    sprite = cocos.sprite.Sprite(actbut[act]+name+'.png')
     sprite.position = pos
     self.add(sprite)
     self.buttons[name] = sprite
-    if act == 1:
-        self.name = ''
-        self.pos = ()
-    if act == -1:
-        self.name = name
-        self.pos = pos
+    self.name, self.pos = ('', ()) if act+1 else (name, pos)
 
+#?
 def det_mate(self):
     field = self.field
     player = self.player
@@ -166,7 +155,7 @@ transfig = {'Q' : 5,
             'R' : 2,
             'B' : 4,
             'N' : 3}
-
+#?
 def step_deviation(self, det, sprite):
     target = self.target
     if det == '0' or det =='0-0':
@@ -185,29 +174,36 @@ def step_deviation(self, det, sprite):
         self.sprites.pop((target[0]-self.player, target[1])).kill()
 
 def closered(self):
+    if field_legal(self.field, self.player):
+        delete_view_red(self)
+        default_par(self)
+
+def delete_view_red(self):
+    self.red.kill()
+    self.red = ()
+    self.labels['player'].kill()
+    if 'mate' in self.labels:
+        self.labels.pop('mate').kill()
+    if self.textview_notation != '':
+        self.textview_notation.kill()
+        self.textview_notation = ''
+        
+def default_par(self):
+    self.notation = []
+    self.numstep = 1
+    self.chosen = 'none'
     ck = det_cell_king(self.field)
     cc = det_castling_control(self.field)
-    if field_legal(self.field, self.player):
-        self.red.kill()
-        self.red = ()
-        self.labels['player'].kill()
-        if 'mate' in self.labels:
-            self.labels.pop('mate').kill()
-        if self.textview_notation != '':
-            self.textview_notation.kill()
-            self.textview_notation = ''
-        self.notation = []
-        self.positions = {'0b' : (self.field, (ck, cc, False, ('l',8)))}
-        self.numstep = 1
-        self.chosen = 'none'
+    self.positions = {'0b' : (self.field, (ck, cc, False, ('l',8)))}
 
+        
 def addpositions(self):
     from show_move import cell_king, castling_control, take_on_aisle
     self.positions[str(self.numstep)+'_wb'[self.player]] = (self.field, (cell_king, castling_control, False, take_on_aisle))
 
 
         
-def detchosen(self, x, y):            
+def det_chosen(self, x, y):            
     chosen = (sign(880-x), (640-y)//80)
     self.redfig = chosen[0]*redfig[chosen[1]]
     self.chosen = 'Image/Figures/'+colors[chosen[0]]+figures[redfig[chosen[1]]]+'.png' if chosen[1] != 0 else 'none'
