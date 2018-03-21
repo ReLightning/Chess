@@ -18,9 +18,9 @@ class graph(cocos.layer.Layer):
         interface.start_parameter(self)
         interface.start_graph(self)
         
+    #словарь функций  
     def on_mouse_press(self, x, y, buttons, modifiers):
         if buttons == 1:
-            field = self.field
             if self.red == ():
                 if 80<=x<=720 and 80<=y<=720:
                     interface.click_board(self, x, y)
@@ -40,7 +40,7 @@ class graph(cocos.layer.Layer):
                         self.sprites.pop(target).kill()
                     if self.chosen != 'none':
                         interface.redfigadd(self)
-                    field[target[0]][target[1]] = self.redfig
+                    self.field[target[0]][target[1]] = self.redfig
         if buttons == 4 and 80<=x<=720 and 80<=y<=720:
             interface.flipboard(self, self.flip)
             self.flip *= -1
@@ -49,7 +49,7 @@ class graph(cocos.layer.Layer):
         if self.activ != (8, 8):
             self.sprites[self.activ].do(Place((x, y)))
         
-
+    #словарь функций
     def on_mouse_release(self, x, y, buttons, modifiers):
         if buttons == 1:
             if self.name != '':
@@ -67,7 +67,7 @@ class graph(cocos.layer.Layer):
                     self.redactor(x, y)
             elif self.activ != (8, 8): 
                 self.chose_cage(x, y)
-
+    #
     def on_key_press(self, key, modifiers):
         if key == 65361:
             num = str(self.numstep-1)+'_wb'[self.player]
@@ -139,7 +139,6 @@ class graph(cocos.layer.Layer):
         self.add(self.red)
 
     def redactor(self, x, y):
-        field = self.field
         if 870<x<930 and 635<y<658:
             self.player *= -1
             t_player = 'Белые' if self.player == 1 else 'Чёрные'
