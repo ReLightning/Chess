@@ -63,6 +63,7 @@ trans = {1 : w_pawn,
 def evaluation(position):
     field = position[0]
     player = position[1]
+    cell_king = position[2][0]
     w_figures = det_myfigures(field, 1)
     b_figures = det_myfigures(field, -1)
     w_figs = [fig for fig in w_figures.values()]
@@ -74,9 +75,15 @@ def evaluation(position):
     for c in w_figures:
         if w_figures[c] in (1,3,4,6):
             evaluate += trans[w_figures[c]][c[0]][c[1]]
+        else:
+            delta = abs(cell_king[-1][0] - c[0]) + abs(cell_king[-1][1] - c[1])
+            evaluate += 4 * (14-delta) if w_figures[c] == 5 else 14-delta
     for c in b_figures:
         if b_figures[c] in (-1,-3,-4,-6):
             evaluate -= trans[b_figures[c]][c[0]][c[1]]
+        else:
+            delta = abs(cell_king[1][0] - c[0]) + abs(cell_king[1][1] - c[1])
+            evaluate -= 4 * (14-delta) if b_figures[c] == 5 else 14-delta
     return evaluate*player
 
 
@@ -126,7 +133,7 @@ def testing(position):
     s = 0
     player = position[1]
     start_parameter_2(position[2])
-    maxdepth = 2
+    maxdepth = 4
     score2 = alphabeta(position, maxdepth, -100001, 100001)
     print(s)
     print(score2*player / 100, bmove)

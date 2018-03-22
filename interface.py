@@ -107,28 +107,25 @@ def graph_move(self, det):
     move(self.field, self.activ, target, trans_fig=5, main=1)
     self.positions = positions
     addpositions(self)
-    if 'shell' in self.sprites:
-        self.sprites.pop('shell').kill()
-    sprite = self.sprites[self.activ]
-    sprite.do(Place(graph_coord(target, self.flip)))
-    if target in self.sprites.keys():
-        self.sprites[target].kill()
-    self.sprites[(target[0], target[1])] = sprite
-    self.sprites.pop(self.activ)
-    step_deviation(self, det[2:], sprite)
+    dem_change(self, det)
     self.player *= -1
     notation.upnotation(self, det, fig, beat, distin)
     if self.player == 1:
         self.numstep += 1
-    else:
-        if False:
-            num = self.positions[str(self.numstep)+'w'] 
-            bmove = testing((num[0],-1,num[1])) 
-            self.activ = bmove[0] 
-            self.target = bmove[1] 
-            graph_move(self, bmove[2])
     self.activ = (8, 8)
-    
+
+def dem_change(self, det):
+    if 'shell' in self.sprites:
+        self.sprites.pop('shell').kill()
+    sprite = self.sprites[self.activ]
+    sprite.do(Place(graph_coord(self.target, self.flip)))
+    if self.target in self.sprites.keys():
+        self.sprites[self.target].kill()
+    self.sprites[(self.target[0], self.target[1])] = sprite
+    self.sprites.pop(self.activ)
+    step_deviation(self, det[2:], sprite)
+
+
 def button_click(self, act, name, pos):
     sprite = cocos.sprite.Sprite(actbut[act]+name+'.png')
     sprite.position = pos
