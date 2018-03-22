@@ -155,23 +155,35 @@ transfig = {'Q' : 5,
             'R' : 2,
             'B' : 4,
             'N' : 3}
-#?
-def step_deviation(self, det, sprite):
+
+def dev_cast(self, det):
     target = self.target
+    activ = self.activ
+    sprite = self.sprites[(target[0], target[1]-(3*len(det)-5)//2)]
+    sprite.do(Place(graph_coord((activ[0], activ[1]-len(det)+2), self.flip)))
+    self.sprites[(activ[0], activ[1]-len(det)+2)] = sprite
+    self.sprites.pop((target[0], target[1]-(3*len(det)-5)//2))
+
+def dev_trans(self, det, sprite):
+    sprite.kill()
+    sprite = cocos.sprite.Sprite('Image/Figures/'+colors[self.player]+figures[transfig[det]]+'.png')
+    sprite.position = graph_coord(self.target, self.flip)
+    sprite.scale = 0.5
+    self.sprites[target] = sprite
+    self.add(sprite)
+
+def dev_aisle(self):
+    self.sprites.pop((self.target[0]-self.player, self.target[1])).kill()
+    
+#словарь    
+def step_deviation(self, det, sprite):
     if det == '0' or det =='0-0':
-        sprite = self.sprites[(target[0], target[1]-(3*len(det)-5)//2)]
-        sprite.do(Place(graph_coord((self.activ[0], self.activ[1]-len(det)+2), self.flip)))
-        self.sprites[(self.activ[0], self.activ[1]-len(det)+2)] = sprite
-        self.sprites.pop((target[0], target[1]-(3*len(det)-5)//2))
+        dev_cast(self, det)
     if det in ('Q','R','B','N'):
-        sprite.kill()
-        sprite = cocos.sprite.Sprite('Image/Figures/'+colors[self.player]+figures[transfig[det]]+'.png')
-        sprite.position = graph_coord(target, self.flip)
-        sprite.scale = 0.5
-        self.sprites[target] = sprite
-        self.add(sprite)
+        dev_trans(self, det, sprite)
     if det == 'a':
-        self.sprites.pop((target[0]-self.player, target[1])).kill()
+        dev_aisle(self)
+        
 
 def closered(self):
     if field_legal(self.field, self.player):

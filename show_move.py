@@ -16,7 +16,7 @@ def start_parameter_2(par = ({1 : (0, 4),
     
 def det_cell_king(field):
     global cell_king
-    cell_king = {sign(field[x][y]):(x, y) for x in range(8) for y in range(8) if abs(field[x][y])==6}
+    cell_king = {sign(fig):(x, y) for x, row in enumerate(field) for y, fig in enumerate(row) if abs(fig)==6}
     return cell_king
 
 def det_castling_control(field):
@@ -36,7 +36,7 @@ def king_and_castling(field, color, old, new, d):
     storlg=new[1]-old[1]
     if abs(storlg) == 2:
         storlg = sign(storlg)
-        rp = 7 if storlg*d == 2 else 0
+        rp = 7 if storlg*d == 1 else 0
         field[new[0]][new[1]-storlg] = 2*color if d == 1 else 0
         field[new[0]][rp] = 0 if d == 1 else 2*color
         cont = castling_control[color]    

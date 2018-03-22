@@ -93,7 +93,6 @@ class graph(cocos.layer.Layer):
             
     def chose_cage(self, x, y):
         global poss_moves, det_moves
-        field = self.field
         self.target = det_target(x, y, self.flip)
         target = self.target
         if target not in poss_moves or not (80<=x<=720 and 80<=y<=720):
