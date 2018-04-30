@@ -32,6 +32,8 @@ class graph(cocos.layer.Layer):
                     interface.button_click(self, -1, 'Сохранить', (360, 40))
                 if 425<=x<=540 and 22<=y<=50:
                     interface.button_click(self, -1, 'Старт', (480, 40))
+                if 960<=x<=1115 and y<=634:
+                    notation.det_step(self, x, y)
             else:
                 if 80<=x<=720 and 80<=y<=720:
                     self.target = det_target(x, y, self.flip)

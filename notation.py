@@ -20,10 +20,22 @@ def makepgn(self):
     file.write(notation)
     file.close()
 
+def det_step(self, x, y):
+    color = 'w' if x < 1035 else 'b'
+    numstep = (650 - y) // 25
+    num = (str(numstep)+color)
+    if num in self.textview_notation:
+        interface.fieldsubs(self, num)
+        sprite = cocos.sprite.Sprite('Image/Utilites/Stepshell.png')
+        pos = (980, 639 - 25*numstep) if color == 'w' else (1065, 639 - 25*numstep)
+        sprite.position = pos
+        self.add(sprite)
+        self.sprites['stepshell'] = sprite
+
 def start_notation(self):
     self.notation_view = cocos.sprite.Sprite('Image/Utilites/Notation.png')
     self.notation_view.position = 1150, 418
-    self.add(self.notation_view)
+    self.add(self.notation_view, z=0)
 
 def upnotation(self, det, fig, beat, distins):
     det = det_update(det, fig, self.target, self.activ, beat)
@@ -70,15 +82,11 @@ def det_distinctness(det, distins, activ):
 
 def view_notation(self, det):
     if self.player == -1:
-        self.notation.append(str(self.numstep)+'.'+ det)
-    else:
-        self.notation.append(det)
-    if self.textview_notation != '':
-        self.textview_notation.kill()
-    notation = ' '.join(self.notation)
-    self.textview_notation = cocos.text.Label(notation, color=(0,0,0,255), multiline=True, width=400)
-    self.textview_notation.position = 960, 634
-    self.add(self.textview_notation)
+        det = (str(self.numstep)+'.'+ det)
+    step = cocos.text.Label(det, color=(0,0,0,255))
+    step.position = 960+(1+self.player)*50, 634-25*self.numstep,
+    self.add(step, z=0)
+    self.textview_notation[str(self.numstep)+'_bw'[self.player]] = step
 
     
 def distinctness(self):
