@@ -75,10 +75,12 @@ class graph(cocos.layer.Layer):
             num = str(self.numstep-1)+'_wb'[self.player]
             if num!='0w':
                 interface.fieldsubs(self, num)
+                notation.det_step(self, 0, 0, True, num)
         if key == 65363:
             num = str(self.numstep)+'_wb'[self.player]
             if num in self.positions:
                 interface.fieldsubs(self, num)
+                notation.det_step(self, 0, 0, True, num)
                 
     def chose_fig(self, x, y):
         global poss_moves, det_moves
@@ -117,9 +119,10 @@ class graph(cocos.layer.Layer):
         self.player = 1
         self.activ = (8, 8)
         self.numstep = 1
-        if self.textview_notation != '':
-            self.textview_notation.kill()
-            self.textview_notation = ''
+        if self.textview_notation != []:
+            for step in self.textview_notation.items():
+                step[1].kill()
+            self.textview_notation = []
         self.notation = []
         start_parameter_2(par=({1 : (0, 4),
                                 -1 : (7, 4)},

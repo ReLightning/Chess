@@ -20,17 +20,29 @@ def makepgn(self):
     file.write(notation)
     file.close()
 
-def det_step(self, x, y):
-    color = 'w' if x < 1035 else 'b'
-    numstep = (650 - y) // 25
-    num = (str(numstep)+color)
-    if num in self.textview_notation:
-        interface.fieldsubs(self, num)
+def stepshell(self, num):
+    if num != '0b':
+        numstep, color = int(num[0]), num[1]
         sprite = cocos.sprite.Sprite('Image/Utilites/Stepshell.png')
         pos = (980, 639 - 25*numstep) if color == 'w' else (1065, 639 - 25*numstep)
         sprite.position = pos
         self.add(sprite)
         self.sprites['stepshell'] = sprite
+    
+def det_step(self, x, y, yuo=False, nex=()):
+    if nex == ():
+        color = 'w' if x < 1035 else 'b'
+        numstep = (650 - y) // 25
+        num = (str(numstep)+color)
+    else:
+        num = nex
+    if yuo:
+        if 'stepshell' in self.sprites:
+            self.sprites['stepshell'].kill()
+        stepshell(self, num)
+    elif num in self.textview_notation:
+        interface.fieldsubs(self, num)
+        stepshell(self, num)
 
 def start_notation(self):
     self.notation_view = cocos.sprite.Sprite('Image/Utilites/Notation.png')

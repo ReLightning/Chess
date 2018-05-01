@@ -110,6 +110,7 @@ def graph_move(self, det):
     dem_change(self, det)
     self.player *= -1
     notation.upnotation(self, det, fig, beat, distin)
+    notation.det_step(self, 1035+self.player, 626-25*self.numstep, True)
     if self.player == 1:
         self.numstep += 1
     self.activ = (8, 8)
