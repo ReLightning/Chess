@@ -194,9 +194,10 @@ def delete_view_red(self):
     self.labels['player'].kill()
     if 'mate' in self.labels:
         self.labels.pop('mate').kill()
-    if self.textview_notation != '':
-        self.textview_notation.kill()
-        self.textview_notation = ''
+    if self.textview_notation != {}:
+        for step in self.textview_notation.items():
+            step[1].kill()
+        self.textview_notation = {}
         
 def default_par(self):
     self.notation = []
