@@ -53,8 +53,9 @@ def start_graph(self):
     
 def flipboard(self, flip):
     for figure in self.sprites:
-        sprite = self.sprites[figure]
-        sprite.do(Place((120+80*((-flip*figure[1]-(flip+1)//2)%8), 120+80*((-flip*figure[0]-(flip+1)//2)%8))))
+        if figure != 'stepshell':
+            sprite = self.sprites[figure]
+            sprite.do(Place((120+80*((-flip*figure[1]-(flip+1)//2)%8), 120+80*((-flip*figure[0]-(flip+1)//2)%8))))
 
 def boardadd(self):
     sprite = cocos.sprite.Sprite('Image/Utilites/Board.jpeg') 
@@ -154,6 +155,7 @@ transfig = {'Q' : 5,
             'B' : 4,
             'N' : 3}
 
+
 def dev_cast(self, det):
     target = self.target
     activ = self.activ
@@ -167,7 +169,7 @@ def dev_trans(self, det, sprite):
     sprite = cocos.sprite.Sprite('Image/Figures/'+colors[self.player]+figures[transfig[det]]+'.png')
     sprite.position = graph_coord(self.target, self.flip)
     sprite.scale = 0.5
-    self.sprites[target] = sprite
+    self.sprites[self.target] = sprite
     self.add(sprite)
 
 def dev_aisle(self):
