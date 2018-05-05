@@ -43,7 +43,7 @@ class graph(cocos.layer.Layer):
                     if self.chosen != 'none':
                         interface.redfigadd(self)
                     self.field[target[0]][target[1]] = self.redfig
-        if buttons == 4 and 80<=x<=720 and 80<=y<=720:
+        if buttons == 4 and 80<=x<=720 and 80<=y<=720 and self.activ == (8, 8):
             interface.flipboard(self, self.flip)
             self.flip *= -1
             
@@ -81,17 +81,24 @@ class graph(cocos.layer.Layer):
             if num in self.positions:
                 interface.fieldsubs(self, num)
                 notation.det_step(self, 0, 0, True, num)
+        if key == 120:
+            if 'bmove' in self.labels:
+                self.labels['bmove'].kill()
+            position = self.positions[str(self.numstep+(-self.player-1)//2)+'_bw'[self.player]]
+            bmove = testing((position[0],self.player,position[1]))
+            label = cocos.text.Label(bmove, font_size=48, position=(800, 150), color=(255,0,0,255))
+            self.labels['bmove'] = label
+            self.add(label)
                 
     def chose_fig(self, x, y):
         global poss_moves, det_moves
-        field = self.field
         self.activ = self.target
         interface.shelladd(self)
         self.remove(self.sprites[self.activ])
         self.add(self.sprites[self.activ], z=1)
         self.sprites[self.activ].do(Place((x, y)))
-        unfigures = det_myfigures(field, -self.player)
-        possibles = possible_moves(field, self.target, self.player, unfigures)
+        unfigures = det_myfigures(self.field, -self.player)
+        possibles = possible_moves(self.field, self.target, self.player, unfigures)
         poss_moves = [possible[:2] for possible in possibles]
         det_moves = [possible[-1] for possible in possibles]
             
@@ -111,28 +118,15 @@ class graph(cocos.layer.Layer):
     def butagain(self):
         if 'mate' in self.labels:
             self.labels.pop('mate').kill()
-        self.field = trans_field()
         for figure in self.sprites:
             self.sprites[figure].kill()
-        self.sprites = {}
-        interface.figureadd(self)
-        self.player = 1
-        self.activ = (8, 8)
-        self.numstep = 1
         if self.textview_notation != {}:
             for step in self.textview_notation.items():
                 step[1].kill()
-            self.textview_notation = {}
-        self.notation = []
-        start_parameter_2(par=({1 : (0, 4),
-                                -1 : (7, 4)},
-                               {1 : (0, 0, 0),
-                                -1 : (0, 0, 0)},
-                               False,
-                               ('l', 8)))
-        from show_move import cell_king, castling_control, take_on_aisle
-        self.positions = {'0b' : (trans_field(), (cell_king, castling_control, False, take_on_aisle))}
-
+        interface.start_parameter(self)
+        self.name, self.pos = 'Заново', (120, 40)
+        interface.figureadd(self)
+        
     def butredactor(self):
         t_player = 'Белые' if self.player == 1 else 'Чёрные'
         self.red = cocos.sprite.Sprite('Image/Utilites/Edit-Figure.png')

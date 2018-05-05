@@ -2,12 +2,7 @@ from field import print_field
 from math_utilite import sign, col
 
 
-def start_parameter_2(par = ({1 : (0, 4),
-                              -1 : (7, 4)},
-                             {1 : (0, 0, 0),
-                              -1 : (0, 0, 0)},
-                             False,
-                             ('l', 8))):
+def start_parameter_2(par):
     global cell_king, castling_control, trans, take_on_aisle
     cell_king = par[0]
     castling_control = par[1]

@@ -37,7 +37,12 @@ def start_parameter(self):
     self.red, self.chosen, self.redfig = (), 'none', 0
     self.flip, self.activ = 1, (8, 8)
     self.notation, self.textview_notation = [], {}
-    start_parameter_2()
+    start_parameter_2(({1 : (0, 4),
+                            -1 : (7, 4)},
+                            {1 : (0, 0, 0),
+                            -1 : (0, 0, 0)},
+                            False,
+                            ('l', 8)))
     from show_move import cell_king, castling_control, take_on_aisle
     self.positions = {'0b' : (trans_field(), (cell_king, castling_control, False, take_on_aisle))}
     

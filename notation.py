@@ -22,7 +22,7 @@ def makepgn(self):
 
 def stepshell(self, num):
     if num != '0b':
-        numstep, color = int(num[0]), num[1]
+        numstep, color = int(num[:-1]), num[-1]
         sprite = cocos.sprite.Sprite('Image/Utilites/Stepshell.png')
         pos = (980, 639 - 25*numstep) if color == 'w' else (1065, 639 - 25*numstep)
         sprite.position = pos
