@@ -34,6 +34,8 @@ class graph(cocos.layer.Layer):
                     interface.button_click(self, -1, 'Старт', (480, 40))
                 if 960<=x<=1115 and y<=634:
                     notation.det_step(self, x, y)
+                if 70<=x<=229 and 730<=y<=770:
+                    interface.det_choice(self, x)
             else:
                 if 80<=x<=720 and 80<=y<=720:
                     self.target = det_target(x, y, self.flip)
@@ -113,6 +115,8 @@ class graph(cocos.layer.Layer):
             self.activ = (8, 8)
         else:
             det = det_moves[poss_moves.index(target)]
+            if det[-1] == 'Q':
+                det = det[:-1] + self.choice
             interface.graph_move(self, det)
             
     def butagain(self):

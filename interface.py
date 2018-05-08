@@ -9,6 +9,11 @@ import copy
 from engine import testing
 import cProfile
 
+transfig = {'Q' : 5,
+            'R' : 2,
+            'B' : 4,
+            'N' : 3}
+
 colors = {1 : 'White-',
           -1 : 'Black-'}
 figures = {6: 'King',
@@ -33,6 +38,7 @@ def start_parameter(self):
     self.field, self.player = trans_field(), 1
     self.numstep = 1
     self.sprites, self.buttons, self.labels = {}, {}, {}
+    self.choice = ()
     self.name, self.pos = '', ()
     self.red, self.chosen, self.redfig = (), 'none', 0
     self.flip, self.activ = 1, (8, 8)
@@ -55,6 +61,8 @@ def start_graph(self):
     button_click(self, 1, 'Сохранить', (360, 40))
     button_click(self, 1, 'Старт', (480, 40))
     notation.start_notation(self)
+    fig_choiceadd(self)
+    
     
 def flipboard(self, flip):
     for figure in self.sprites:
@@ -74,8 +82,15 @@ def figureadd(self):
         sprite = cocos.sprite.Sprite('Image/Figures/'+colors[sign(fig)]+figures[abs(fig)]+'.png')
         sprite.position = graph_coord(cell, self.flip)
         sprite.scale = 0.5
-        self.add(sprite, z=0)
+        self.add(sprite)
         self.sprites[cell] = sprite
+
+def fig_choiceadd(self):
+    sprite = cocos.sprite.Sprite('Image/Utilites/Fig-Choice.png')
+    sprite.position = 150, 750
+    sprite.scale = 0.25
+    self.add(sprite)
+    self.choice = 'Q'
         
 #?
 def fieldsubs(self, num):
@@ -110,7 +125,8 @@ def graph_move(self, det):
     fig = abs(self.field[self.activ[0]][self.activ[1]])
     distin = notation.distinctness(self)
     positions = copy.deepcopy(self.positions)
-    move(self.field, self.activ, target, trans_fig=5, main=1)
+    tf = 5 if det[-1] not in transfig else transfig[det[-1]]
+    move(self.field, self.activ, target, trans_fig=tf, main=1)
     self.positions = positions
     addpositions(self)
     dem_change(self, det)
@@ -140,6 +156,9 @@ def button_click(self, act, name, pos):
     self.buttons[name] = sprite
     self.name, self.pos = ('', ()) if act+1 else (name, pos)
 
+def det_choice(self, x):
+    self.choice = 'QRBN'[(x-70) // 40]
+
 #?
 def det_mate(self):
     field = self.field
@@ -154,11 +173,6 @@ def det_mate(self):
             label = cocos.text.Label('Пат', font_size=48, position=(400, 400), color=(255,0,0,255))
             self.add(label)
             self.labels['mate'] = label
-
-transfig = {'Q' : 5,
-            'R' : 2,
-            'B' : 4,
-            'N' : 3}
 
 
 def dev_cast(self, det):
