@@ -72,7 +72,7 @@ def testing(position):
     s = 0
     player = position[1]
     start_parameter_2(position[2])
-    maxdepth = 2
+    maxdepth = 4
     score2 = alphabeta(position, maxdepth, -100001, 100001)
     if __name__=='__main__': 
         print(s)

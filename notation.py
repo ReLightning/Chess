@@ -81,8 +81,7 @@ def det_shah_mate(det, field, player, labels):
     return det
 
 def det_distinctness(det, distins, activ):
-    xs = False
-    ys = False
+    xs = ys = False
     for x, y in distins:
         xs = xs or activ[0] == x
         ys = ys or activ[1] == y
@@ -95,6 +94,7 @@ def det_distinctness(det, distins, activ):
 def view_notation(self, det):
     if self.player == -1:
         det = (str(self.numstep)+'.'+ det)
+    self.notation.append(det)
     step = cocos.text.Label(det, color=(0,0,0,255))
     step.position = 960+(1+self.player)*50, 634-25*self.numstep,
     self.add(step, z=0)

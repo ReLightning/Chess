@@ -38,7 +38,7 @@ def start_parameter(self):
     self.field, self.player = trans_field(), 1
     self.numstep = 1
     self.sprites, self.buttons, self.labels = {}, {}, {}
-    self.choice = ()
+    self.choice = 'Q'
     self.name, self.pos = '', ()
     self.red, self.chosen, self.redfig = (), 'none', 0
     self.flip, self.activ = 1, (8, 8)
@@ -166,11 +166,11 @@ def det_mate(self):
     unfigures = det_myfigures(field, -player)
     if not exist_moves(field, player, unfigures):
         if check_field_on_shah(field, player, unfigures):
-            label = cocos.text.Label('Мат', font_size=48, position=(400, 400), color=(255,0,0,255))
+            label = cocos.text.Label('Мат', font_size=48, position=(400, 720), color=(255,0,0,255))
             self.add(label)
             self.labels['mate'] = label
         else:
-            label = cocos.text.Label('Пат', font_size=48, position=(400, 400), color=(255,0,0,255))
+            label = cocos.text.Label('Пат', font_size=48, position=(400, 720), color=(255,0,0,255))
             self.add(label)
             self.labels['mate'] = label
 

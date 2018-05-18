@@ -1,4 +1,4 @@
-[Event "Salmon Chess"]
+[Event "SalmonChess"]
 [Site "?"]
 [Date "????.??.??"]
 [Round "?"]
